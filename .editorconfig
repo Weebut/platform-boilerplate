@@ -1,0 +1,33 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,tf,tfvars,cjs}]
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+[**.ts]
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+[*.{tsx, jsx}]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.{conf,config,template}]
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+[*.md]
+charset = utf-8
+indent_style = space
+indent_size = 2
+max_line_length = off
+trim_trailing_whitespace = false

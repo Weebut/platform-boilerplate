@@ -1,0 +1,17 @@
+upstream web {
+    server ${WEB_HOST}:3000;
+}
+
+server {
+
+    listen 80 default_server;
+    server_name ${WEB_DOMAIN};
+
+    location / {
+        proxy_pass http://web;
+    }
+
+    location = /health {
+        return 200 'OK';
+    }
+}

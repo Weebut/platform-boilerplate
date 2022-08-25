@@ -1,0 +1,26 @@
+ARG NODE_VERSION
+# Install dependencies only when needed
+FROM node:${NODE_VERSION}-alpine
+
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN \
+	if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+	elif [ -f package-lock.json ]; then npm ci; \
+	elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
+	else echo "Lockfile not found." && exit 1; \
+	fi
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+COPY --chown=node:node ./entrypoint-dev.sh ./
+
+ENTRYPOINT [ "sh","/app/entrypoint-dev.sh" ]

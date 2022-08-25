@@ -1,0 +1,17 @@
+upstream api {
+  server ${API_HOST}:4000;
+}
+
+server {
+
+  listen 80 default_server;
+	server_name ${API_DOMAIN};
+
+  location / {
+    proxy_pass http://api;
+  }
+
+  location = /health {
+		return 200 'OK';
+  }
+}
