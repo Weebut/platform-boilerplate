@@ -52,10 +52,10 @@ jobs:
               - "./backend/Dockerfile"
               - "./backend/docker-compose.yaml"
               - "./backend/entrypoint.sh"
-              - ".github/workflows/workflow.yaml"
+              - '.github/workflows/backend.yaml'
             nginx:
               - "./backend/nginx/**"
-              - ".github/workflows/workflow.yaml"
+              - '.github/workflows/backend.yaml'
       - name: Prepare Slack Message
         id: slack-message-creator
         shell: bash
