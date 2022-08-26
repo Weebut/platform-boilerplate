@@ -64,7 +64,7 @@ jobs:
           SLACK_MESSAGE=""
 
           SOURCE_FLAGS=("${{ steps.filter.outputs.nginx }}" "${{ steps.filter.outputs.app }}")
-          SOURCES=("nginx-front" "app")
+          SOURCES=("nginx-front" "web")
           UPDATED_SOURCES=""
           for i in "${!SOURCE_FLAGS[@]}"; do
             echo ${SOURCE_FLAGS[i]}
@@ -222,7 +222,7 @@ jobs:
         id: dotenv-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-dotenv-${{needs.deploy-ready.outputs.stage}}
+          cache-name: cache-dotenv-front-${{needs.deploy-ready.outputs.stage}}
         with:
           path: ./frontend/.env
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
@@ -231,7 +231,7 @@ jobs:
         id: tfvars-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-tfvars-${{needs.deploy-ready.outputs.stage}}
+          cache-name: cache-tfvars-front-${{needs.deploy-ready.outputs.stage}}
         with:
           path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
@@ -273,7 +273,7 @@ jobs:
         id: dotenv-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-dotenv-${{needs.deploy-ready.outputs.stage}}
+          cache-name: cache-dotenv-front-${{needs.deploy-ready.outputs.stage}}
         with:
           path: ./frontend/.env
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
@@ -316,7 +316,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/cache@v3
         env:
-          cache-name: cache-tfvars-${{needs.deploy-ready.outputs.stage}}
+          cache-name: cache-tfvars-front-${{needs.deploy-ready.outputs.stage}}
         with:
           path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
