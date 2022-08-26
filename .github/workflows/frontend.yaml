@@ -239,7 +239,6 @@ jobs:
     name: image preparation start
     runs-on: ubuntu-latest
     needs: [prepare-dotenv, deploy-ready]
-    working-directory: ./frontend
     environment: ${{needs.deploy-ready.outputs.stage}}
     if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
     steps:
@@ -271,6 +270,7 @@ jobs:
       - name: cache dotenv
         if: ${{ success() }}
         id: dotenv-cache
+        working-directory: ./frontend
         uses: actions/cache@v3
         env:
           cache-name: cache-dotenv-${{needs.deploy-ready.outputs.stage}}
