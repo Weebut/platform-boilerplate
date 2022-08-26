@@ -50,3 +50,25 @@ resource "aws_ecr_repository" "server_nginx" {
 
   tags = local.tags
 }
+
+resource "aws_ecr_repository" "client_nginx" {
+  name                 = "client-nginx"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
+resource "aws_ecr_repository" "client" {
+  name                 = "client"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}

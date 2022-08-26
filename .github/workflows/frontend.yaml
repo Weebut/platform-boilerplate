@@ -326,7 +326,7 @@ jobs:
         with:
           path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
-      - run: terraform init -frontend-config="key=lightsail-client-deploy"
+      - run: terraform init -backend-config="key=lightsail-client-deploy"
         if: ${{ success() }}
         working-directory: ./terraform/lightsail/deploy
       - run: terraform workspace new ${{needs.deploy-ready.outputs.stage}}
