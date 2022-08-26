@@ -8,7 +8,6 @@ services:
       args:
         - NGINX_VERSION=${NGINX_VERSION:-1.19}
     image: ${ECR_REGISTRY}/${ECR_WEB_NGINX_REPOSITORY}:${NGINX_VERSION:-1.19}-${ENV:-dev}-${TAG:-latest}
-    container_name: nginx
     ports:
       - 80:80
     env_file:
@@ -22,7 +21,6 @@ services:
       args:
         - NODE_VERSION=${NODE_VERSION:-16.14.2}
     image: ${ECR_REGISTRY}/${ECR_WEB_REPOSITORY}:${NODE_VERSION:-16.14.2}-${ENV:-dev}-${TAG:-latest}
-    container_name: web
     restart: always
     ports:
       - ${WEB_PORT:-3000}:3000

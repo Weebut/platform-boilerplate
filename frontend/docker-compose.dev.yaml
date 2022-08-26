@@ -7,7 +7,6 @@ volumes:
 services:
   nginx:
     image: nginx:${NGINX_VERSION:-1.19}-alpine
-    container_name: nginx
     ports:
       - 80:80
     env_file:
@@ -26,7 +25,6 @@ services:
       dockerfile: Dockerfile.dev
       args:
         - NODE_VERSION=${NODE_VERSION:-16.14.2}
-    container_name: web
     restart: always
     env_file:
       - .env.development

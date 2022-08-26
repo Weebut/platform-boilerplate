@@ -14,6 +14,8 @@ services:
     restart: always
     volumes:
       - mysqldata:/var/lib/mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
     env_file:
       - .env.development
   redis:
@@ -23,7 +25,6 @@ services:
       - redisdata:/data
   nginx:
     image: nginx:${NGINX_VERSION:-1.19}-alpine
-    container_name: nginx
     ports:
       - 80:80
     env_file:
@@ -42,7 +43,6 @@ services:
       dockerfile: Dockerfile.dev
       args:
         - NODE_VERSION=${NODE_VERSION:-16.14.2}
-    container_name: app
     restart: always
     env_file:
       - .env.development
@@ -50,22 +50,4 @@ services:
       - db
       - redis
     volumes:
-      - ./backend:/app
-  strapi:
-    build:
-      context: ./strapi
-
-    environment:
-      DATABASE_CLIENT: mysql
-      DATABASE_HOST: mysql
-      DATABASE_PORT: 3306
-      DATABASE_NAME: strapi
-      DATABASE_USERNAME: strapi
-      DATABASE_PASSWORD: strapi
-      DATABASE_SSL: 'false'
-    volumes:
-      - ./app:/srv/app
-    ports:
-      - '1337:1337'
-    depends_on:
-      - mysql
+      - .:/app
