@@ -112,6 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-ready
     if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+    environment: ${{needs.deploy-ready.outputs.stage}}
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
@@ -124,7 +125,6 @@ jobs:
       - name: Create dotenv .env for dev
         shell: bash
         working-directory: ./frontend
-        environment: ${{needs.deploy-ready.outputs.stage}}
         env:
           API_BASE_URL: ${{secrets.API_BASE_URL}}
           GITHUB_CLIENT_ID: ${{secrets.GH_CLIENT_ID}}
