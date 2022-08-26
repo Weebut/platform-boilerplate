@@ -122,7 +122,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-      - name: Create dotenv .env for dev
+      - name: Create dotenv .env
         shell: bash
         working-directory: ./frontend
         env:
@@ -234,42 +234,13 @@ jobs:
         with:
           path: '../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
-      - name: status save - failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.21.0
-        with:
-          update-ts: ${{ needs.deploy-ready.outputs.ts }}
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "클라이언트 배포가 실패했습니다",
-              "attachments": [
-                {
-                  "color": "#cc0000",
-                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{needs.deploy-ready.outputs.stage}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
-                  "fields": [
-                    {
-                      "title": "Services",
-                      "short": true,
-                      "value": "${{needs.deploy-ready.outputs.slack-message}}"
-                    },
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Failed"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   image-prepare:
     name: image preparation start
     runs-on: ubuntu-latest
     needs: [prepare-dotenv, deploy-ready]
+    working-directory: ./frontend
+    environment: ${{needs.deploy-ready.outputs.stage}}
     if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
     steps:
       - uses: actions/checkout@v3
@@ -322,42 +293,12 @@ jobs:
         if: ${{ success() }}
         working-directory: ./frontend
         run: docker compose push ${{needs.deploy-ready.outputs.services}}
-      - name: status save - failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.21.0
-        with:
-          update-ts: ${{ needs.deploy-ready.outputs.ts }}
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "클라이언트 배포가 실패했습니다",
-              "attachments": [
-                {
-                  "color": "#cc0000",
-                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{needs.deploy-ready.outputs.stage}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
-                  "fields": [
-                    {
-                      "title": "Services",
-                      "short": true,
-                      "value": "${{needs.deploy-ready.outputs.slack-message}}"
-                    },
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Failed"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   deploy-service:
     name: service deployment
     runs-on: ubuntu-latest
     needs: [image-prepare, deploy-ready]
+    environment: ${{needs.deploy-ready.outputs.stage}}
     if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
     steps:
       - uses: actions/checkout@v3
@@ -398,37 +339,6 @@ jobs:
         if: ${{ success() }}
         working-directory: ../terraform/lightsail/deploy
         run: terraform apply -auto-approve -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
-      - name: status save - failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.21.0
-        with:
-          update-ts: ${{ needs.deploy-ready.outputs.ts }}
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "클라이언트 배포가 실패했습니다",
-              "attachments": [
-                {
-                  "color": "#cc0000",
-                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{needs.deploy-ready.outputs.stage}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
-                  "fields": [
-                    {
-                      "title": "Services",
-                      "short": true,
-                      "value": "${{needs.deploy-ready.outputs.slack-message}}"
-                    },
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "Failed"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   deploy-end:
     name: deploy end notification
