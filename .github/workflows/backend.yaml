@@ -12,7 +12,7 @@ on:
       - 'backend/package-lock.json'
       - 'backend/nest-cli.json'
       - 'backend/tsconfig*.json'
-      - 'backend/src'
+      - 'backend/src/**'
       - 'backend/docker-compose.yaml'
       - 'backend/Dockerfile'
 

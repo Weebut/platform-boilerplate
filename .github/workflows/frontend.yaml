@@ -12,7 +12,7 @@ on:
       - 'frontend/package-lock.json'
       - 'frontend/nest-cli.json'
       - 'frontend/tsconfig*.json'
-      - 'frontend/src'
+      - 'frontend/src/**'
       - 'frontend/docker-compose.yaml'
       - 'frontend/Dockerfile'
 
