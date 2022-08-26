@@ -108,8 +108,8 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  prepare-dotenv:
-    name: prepare dotenv file
+  prepare-env:
+    name: prepare env file
     runs-on: ubuntu-latest
     needs: deploy-ready
     if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
