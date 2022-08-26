@@ -233,7 +233,7 @@ jobs:
         env:
           cache-name: cache-tfvars-${{needs.deploy-ready.outputs.stage}}
         with:
-          path: '../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
+          path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
 
   image-prepare:
@@ -318,26 +318,26 @@ jobs:
         env:
           cache-name: cache-tfvars-${{needs.deploy-ready.outputs.stage}}
         with:
-          path: '../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
+          path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
       - run: terraform init -frontend-config="key=lightsail-client-deploy"
         if: ${{ success() }}
-        working-directory: ../terraform/lightsail/deploy
+        working-directory: ./terraform/lightsail/deploy
       - run: terraform workspace new ${{needs.deploy-ready.outputs.stage}}
-        working-directory: ../terraform/lightsail/deploy
+        working-directory: ./terraform/lightsail/deploy
         continue-on-error: true
       - run: terraform workspace select ${{needs.deploy-ready.outputs.stage}}
-        working-directory: ../terraform/lightsail/deploy
+        working-directory: ./terraform/lightsail/deploy
         continue-on-error: true
       - name: Terraform Plan
         id: plan
         if: ${{ success() }}
-        working-directory: ../terraform/lightsail/deploy
+        working-directory: ./terraform/lightsail/deploy
         run: terraform plan -no-color -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
       - name: Terraform Apply
         id: apply
         if: ${{ success() }}
-        working-directory: ../terraform/lightsail/deploy
+        working-directory: ./terraform/lightsail/deploy
         run: terraform apply -auto-approve -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
 
   deploy-end:
