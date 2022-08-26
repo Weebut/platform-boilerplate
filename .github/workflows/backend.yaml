@@ -149,7 +149,7 @@ jobs:
           echo "ECR_SERVER_REPOSITORY=$ECR_SERVER_REPOSITORY" >> .env
           echo "ECR_SERVER_NGINX_REPOSITORY=$ECR_SERVER_NGINX_REPOSITORY" >> .env
           echo "ENV=$ENV" >> .env
-          cat > ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
+          cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
           environment = "${{needs.deploy-ready.outputs.stage}}"
           container_deployments = [
             {
@@ -241,7 +241,7 @@ jobs:
         env:
           cache-name: cache-tfvars-${{needs.deploy-ready.outputs.stage}}
         with:
-          path: './terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
+          path: '../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
       - name: status save - failure
         if: ${{ failure() }}
@@ -386,26 +386,26 @@ jobs:
         env:
           cache-name: cache-tfvars-${{needs.deploy-ready.outputs.stage}}
         with:
-          path: './terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
+          path: '../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars'
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
       - run: terraform init -backend-config="key=lightsail-server-deploy"
         if: ${{ success() }}
-        working-directory: ./terraform/lightsail/deploy
+        working-directory: ../terraform/lightsail/deploy
       - run: terraform workspace new ${{needs.deploy-ready.outputs.stage}}
-        working-directory: ./terraform/lightsail/deploy
+        working-directory: ../terraform/lightsail/deploy
         continue-on-error: true
       - run: terraform workspace select ${{needs.deploy-ready.outputs.stage}}
-        working-directory: ./terraform/lightsail/deploy
+        working-directory: ../terraform/lightsail/deploy
         continue-on-error: true
       - name: Terraform Plan
         id: plan
         if: ${{ success() }}
-        working-directory: ./terraform/lightsail/deploy
+        working-directory: ../terraform/lightsail/deploy
         run: terraform plan -no-color -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
       - name: Terraform Apply
         id: apply
         if: ${{ success() }}
-        working-directory: ./terraform/lightsail/deploy
+        working-directory: ../terraform/lightsail/deploy
         run: terraform apply -auto-approve -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
       - name: status save - failure
         if: ${{ failure() }}
