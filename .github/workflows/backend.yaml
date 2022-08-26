@@ -55,6 +55,7 @@ jobs:
               - '.github/workflows/backend.yaml'
             nginx:
               - "./backend/nginx/**"
+              - "./backend/docker-compose.yaml"
               - '.github/workflows/backend.yaml'
       - name: Prepare Slack Message
         id: slack-message-creator

@@ -21,7 +21,7 @@ services:
     restart: always
     volumes:
       - redisdata:/data
-  nginx:
+  nginx-back:
     build:
       context: ./nginx
       dockerfile: Dockerfile
