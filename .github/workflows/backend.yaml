@@ -121,26 +121,26 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-      - name: Create dotenv .env for dev
+      - name: Create dotenv .env
         shell: bash
+        environment: ${{needs.deploy-ready.outputs.stage}}
         working-directory: ./backend
-        if: needs.deploy-ready.outputs.branch == 'develop'
         env:
-          MYSQL_DATABASE: ${{ secrets.PROD_MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.PROD_MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.PROD_MYSQL_PASSWORD }}
-          DATABASE_SYNC: ${{ secrets.PROD_DATABASE_SYNC }}
-          DATABASE_MIGRATION: ${{ secrets.PROD_DATABASE_MIGRATION }}
-          API_PORT: ${{ secrets.PROD_API_PORT }}
-          API_DOMAIN: ${{ secrets.PROD_API_DOMAIN }}
-          NGINX_VERSION: ${{ secrets.DEV_NGINX_VERSION }}
-          MYSQL_VERSION: ${{ secrets.DEV_MYSQL_VERSION }}
-          REDIS_VERSION: ${{ secrets.DEV_REDIS_VERSION }}
-          NODE_VERSION: ${{ secrets.DEV_NODE_VERSION }}
-          ECR_REGISTRY: ${{ secrets.DEV_ECR_REGISTRY }}
-          ECR_SERVER_REPOSITORY: ${{ secrets.DEV_ECR_SERVER_REPOSITORY }}
-          ECR_SERVER_NGINX_REPOSITORY: ${{ secrets.DEV_ECR_SERVER_NGINX_REPOSITORY }}
-          ENV: dev
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          DATABASE_SYNC: ${{ secrets.DATABASE_SYNC }}
+          DATABASE_MIGRATION: ${{ secrets.DATABASE_MIGRATION }}
+          API_PORT: ${{ secrets.API_PORT }}
+          API_DOMAIN: ${{ secrets.API_DOMAIN }}
+          NGINX_VERSION: ${{ secrets.NGINX_VERSION }}
+          MYSQL_VERSION: ${{ secrets.MYSQL_VERSION }}
+          REDIS_VERSION: ${{ secrets.REDIS_VERSION }}
+          NODE_VERSION: ${{ secrets.NODE_VERSION }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_SERVER_REPOSITORY: ${{ secrets.ECR_SERVER_REPOSITORY }}
+          ECR_SERVER_NGINX_REPOSITORY: ${{ secrets.ECR_SERVER_NGINX_REPOSITORY }}
+          ENV: ${{needs.deploy-ready.outputs.stage}}
         run: |
           echo "NGINX_VERSION=$NGINX_VERSION" >> .env
           echo "NODE_VERSION=$NODE_VERSION" >> .env
@@ -150,111 +150,7 @@ jobs:
           echo "ECR_SERVER_NGINX_REPOSITORY=$ECR_SERVER_NGINX_REPOSITORY" >> .env
           echo "ENV=$ENV" >> .env
           cat > ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
-          environment = "dev"
-          container_deployments = [
-            {
-              name = "server"
-              containers = [{
-                name = "app"
-                image = "$ECR_REGISTRY/$ECR_SERVER_REPOSITORY:$NODE_VERSION-$ENV-latest"
-                command = []
-                environment = {
-                  MYSQL_DATABASE = "$MYSQL_DATABASE"
-                  MYSQL_PASSWORD = "$MYSQL_PASSWORD"
-                  MYSQL_USER = "$MYSQL_USER"
-                  DATABASE_SYNC = "$DATABASE_SYNC"
-                  DATABASE_MIGRATION = "$DATABASE_MIGRATION"
-                  REDIS_HOST = "localhost"
-                  API_PORT = $API_PORT
-                }
-                ports = {
-                  "$API_PORT" = "HTTP"
-                }
-                endpoint_port = -1
-                health_check = {
-                  healthy_threshold = -1
-                  unhealthy_threshold = -1
-                  timeout_seconds = -1
-                  interval_seconds = -1
-                  path  = "/health"
-                  success_codes = "200"
-                }
-                is_public = false
-              },
-              {
-                name = "nginx"
-                image = "$ECR_REGISTRY/$ECR_SERVER_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
-                command = []
-                environment = {
-                  API_HOST = "localhost"
-                  API_DOMAIN = "$API_DOMAIN"
-                }
-                ports = {
-                  "80" = "HTTP"
-                }
-                endpoint_port = 80
-                health_check = {
-                  healthy_threshold = 2
-                  unhealthy_threshold = 5
-                  timeout_seconds = 10
-                  interval_seconds = 15
-                  path  = "/health"
-                  success_codes = "200"
-                }
-                is_public = true
-              },
-              {
-                name = "redis"
-                image = "redis:$REDIS_VERSION"
-                command = []
-                environment = {}
-                ports = {
-                  "6379" = "TCP"
-                }
-                endpoint_port = -1
-                health_check = {
-                  healthy_threshold = -1
-                  unhealthy_threshold = -1
-                  timeout_seconds = -1
-                  interval_seconds = -1
-                  path  = "/health"
-                  success_codes = "200"
-                }
-                is_public = false
-              }]
-            }
-          ]
-          EOL
-      - name: Create dotenv .env for production
-        shell: bash
-        working-directory: ./backend
-        if: needs.deploy-ready.outputs.branch == 'main'
-        env:
-          MYSQL_DATABASE: ${{ secrets.PROD_MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.PROD_MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.PROD_MYSQL_PASSWORD }}
-          DATABASE_SYNC: ${{ secrets.PROD_DATABASE_SYNC }}
-          DATABASE_MIGRATION: ${{ secrets.PROD_DATABASE_MIGRATION }}
-          API_PORT: ${{ secrets.PROD_API_PORT }}
-          API_DOMAIN: ${{ secrets.PROD_API_DOMAIN }}
-          NGINX_VERSION: ${{ secrets.PROD_NGINX_VERSION }}
-          MYSQL_VERSION: ${{ secrets.PROD_MYSQL_VERSION }}
-          REDIS_VERSION: ${{ secrets.PROD_REDIS_VERSION }}
-          NODE_VERSION: ${{ secrets.PROD_NODE_VERSION }}
-          ECR_REGISTRY: ${{ secrets.PROD_ECR_REGISTRY }}
-          ECR_SERVER_REPOSITORY: ${{ secrets.PROD_ECR_SERVER_REPOSITORY }}
-          ECR_SERVER_NGINX_REPOSITORY: ${{ secrets.PROD_ECR_SERVER_NGINX_REPOSITORY }}
-          ENV: prod
-        run: |
-          echo "NGINX_VERSION=$NGINX_VERSION" >> .env
-          echo "NODE_VERSION=$NODE_VERSION" >> .env
-          echo "REDIS_VERSION=$REDIS_VERSION" >> .env
-          echo "ECR_REGISTRY=$ECR_REGISTRY" >> .env
-          echo "ECR_SERVER_REPOSITORY=$ECR_SERVER_REPOSITORY" >> .env
-          echo "ECR_SERVER_NGINX_REPOSITORY=$ECR_SERVER_NGINX_REPOSITORY" >> .env
-          echo "ENV=$ENV" >> .env
-          cat > ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
-          environment = "prod"
+          environment = "${{needs.deploy-ready.outputs.stage}}"
           container_deployments = [
             {
               name = "server"

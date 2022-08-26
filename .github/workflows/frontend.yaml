@@ -124,27 +124,28 @@ jobs:
       - name: Create dotenv .env for dev
         shell: bash
         working-directory: ./frontend
-        if: needs.deploy-ready.outputs.branch == 'develop'
+        environment: ${{needs.deploy-ready.outputs.stage}}
         env:
-          API_BASE_URL: ${{secrets.DEV_API_BASE_URL}}
-          GITHUB_CLIENT_ID: ${{secrets.DEV_GITHUB_CLIENT_ID}}
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{secrets.DEV_NEXT_PUBLIC_FIREBASE_API_KEY}}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{secrets.DEV_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{secrets.DEV_NEXT_PUBLIC_FIREBASE_PROJECT_ID}}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{secrets.DEV_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{secrets.DEV_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{secrets.DEV_NEXT_PUBLIC_FIREBASE_APP_ID}}
-          FIREBASE_PROJECT_ID: ${{secrets.DEV_FIREBASE_PROJECT_ID}}
-          FIREBASE_SERVICE_ACCOUNT_KEY: ${{secrets.DEV_FIREBASE_SERVICE_ACCOUNT_KEY}}
-          SECRET_COOKIE_PASSWORD_1: ${{secrets.DEV_SECRET_COOKIE_PASSWORD_1}}
-          SECRET_COOKIE_PASSWORD_2: ${{secrets.DEV_SECRET_COOKIE_PASSWORD_2}}
-          NGINX_VERSION: ${{ secrets.DEV_NGINX_VERSION }}
-          NODE_VERSION: ${{ secrets.DEV_NODE_VERSION }}
-          ECR_REGISTRY: ${{ secrets.DEV_ECR_REGISTRY }}
-          ECR_WEB_REPOSITORY: ${{ secrets.DEV_ECR_WEB_REPOSITORY }}
-          ECR_WEB_NGINX_REPOSITORY: ${{ secrets.DEV_ECR_WEB_NGINX_REPOSITORY }}
-          WEB_DOMAIN: ${{ secrets.DEV_WEB_DOMAIN }}
-          ENV: dev
+          API_BASE_URL: ${{secrets.API_BASE_URL}}
+          GITHUB_CLIENT_ID: ${{secrets.GH_CLIENT_ID}}
+          GITHUB_SECRET: ${{secrets.GH_SECRET}}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{secrets.NEXT_PUBLIC_FIREBASE_API_KEY}}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID}}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{secrets.NEXT_PUBLIC_FIREBASE_APP_ID}}
+          FIREBASE_PROJECT_ID: ${{secrets.FIREBASE_PROJECT_ID}}
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{secrets.FIREBASE_SERVICE_ACCOUNT_KEY}}
+          SECRET_COOKIE_PASSWORD_1: ${{secrets.SECRET_COOKIE_PASSWORD_1}}
+          SECRET_COOKIE_PASSWORD_2: ${{secrets.SECRET_COOKIE_PASSWORD_2}}
+          NGINX_VERSION: ${{ secrets.NGINX_VERSION }}
+          NODE_VERSION: ${{ secrets.NODE_VERSION }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_WEB_REPOSITORY: ${{ secrets.ECR_WEB_REPOSITORY }}
+          ECR_WEB_NGINX_REPOSITORY: ${{ secrets.ECR_WEB_NGINX_REPOSITORY }}
+          WEB_DOMAIN: ${{ secrets.WEB_DOMAIN }}
+          ENV: ${{needs.deploy-ready.outputs.stage}}
         run: |
           echo "NGINX_VERSION=$NGINX_VERSION" >> .env
           echo "NODE_VERSION=$NODE_VERSION" >> .env
@@ -153,88 +154,7 @@ jobs:
           echo "ECR_WEB_NGINX_REPOSITORY=$ECR_WEB_NGINX_REPOSITORY" >> .env
           echo "ENV=$ENV" >> .env
           cat > ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
-          environment = "dev"
-          container_deployments = [
-            {
-              name = "client"
-              containers = [{
-                name = "app"
-                image = "$ECR_REGISTRY/$ECR_WEB_REPOSITORY:$NODE_VERSION-$ENV-latest"
-                command = []
-                environment = {
-                  API_BASE_URL = "$API_BASE_URL"
-                  GITHUB_CLIENT_ID = "$GITHUB_CLIENT_ID"
-                  GITHUB_SECRET = "$GITHUB_SECRET"
-                  NEXT_PUBLIC_FIREBASE_API_KEY = "$NEXT_PUBLIC_FIREBASE_API_KEY"
-                  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
-                  NEXT_PUBLIC_FIREBASE_PROJECT_ID = "$NEXT_PUBLIC_FIREBASE_PROJECT_ID"
-                  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = "$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
-                  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
-                  NEXT_PUBLIC_FIREBASE_APP_ID = "$NEXT_PUBLIC_FIREBASE_APP_ID"
-                  FIREBASE_PROJECT_ID = "$FIREBASE_PROJECT_ID"
-                  FIREBASE_SERVICE_ACCOUNT_KEY = "$FIREBASE_SERVICE_ACCOUNT_KEY"
-                  SECRET_COOKIE_PASSWORD_1 = "$SECRET_COOKIE_PASSWORD_1"
-                  SECRET_COOKIE_PASSWORD_2 = "$SECRET_COOKIE_PASSWORD_2"
-                }
-                ports = {
-                  "3000" = "HTTP"
-                }
-                endpoint_port = -1
-                health_check = {
-                  healthy_threshold = -1
-                  unhealthy_threshold = -1
-                  timeout_seconds = -1
-                  interval_seconds = -1
-                  path  = "/health"
-                  success_codes = "200"
-                }
-                is_public = false
-              },
-              {
-                name = "nginx"
-                image = "$ECR_REGISTRY/$ECR_WEB_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
-                command = []
-                environment = {
-                  WEB_HOST = "localhost"
-                  WEB_DOMAIN = "$WEB_DOMAIN"
-                }
-                ports = {
-                  "80" = "HTTP"
-                }
-                endpoint_port = 80
-                health_check = {
-                  healthy_threshold = 2
-                  unhealthy_threshold = 5
-                  timeout_seconds = 10
-                  interval_seconds = 15
-                  path  = "/health"
-                  success_codes = "200"
-                }
-                is_public = true
-              }]
-            }
-          ]
-          EOL
-      - name: Create dotenv .env for production
-        shell: bash
-        working-directory: ./frontend
-        if: needs.deploy-ready.outputs.branch == 'main'
-        env:
-          NGINX_VERSION: ${{ secrets.DEV_NGINX_VERSION }}
-          NODE_VERSION: ${{ secrets.DEV_NODE_VERSION }}
-          ECR_REGISTRY: ${{ secrets.DEV_ECR_REGISTRY }}
-          ECR_WEB_REPOSITORY: ${{ secrets.DEV_ECR_WEB_REPOSITORY }}
-          ECR_WEB_NGINX_REPOSITORY: ${{ secrets.DEV_ECR_WEB_NGINX_REPOSITORY }}
-          ENV: prod
-        run: |
-          echo "NGINX_VERSION=$NGINX_VERSION" >> .env
-          echo "NODE_VERSION=$NODE_VERSION" >> .env
-          echo "ECR_REGISTRY=$ECR_REGISTRY" >> .env
-          echo "ECR_WEB_REPOSITORY=$ECR_WEB_REPOSITORY" >> .env
-          echo "ECR_WEB_NGINX_REPOSITORY=$ECR_WEB_NGINX_REPOSITORY" >> .env
-          echo "ENV=$ENV" >> .env
-          cat > ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
-          environment = "prod"
+          environment = "${{needs.deploy-ready.outputs.stage}}"
           container_deployments = [
             {
               name = "client"
