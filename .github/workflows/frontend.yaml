@@ -153,6 +153,8 @@ jobs:
           echo "ECR_REGISTRY=$ECR_REGISTRY" >> .env
           echo "ECR_WEB_REPOSITORY=$ECR_WEB_REPOSITORY" >> .env
           echo "ECR_WEB_NGINX_REPOSITORY=$ECR_WEB_NGINX_REPOSITORY" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_KEY=$FIREBASE_SERVICE_ACCOUNT_KEY" >> .env
+          echo "FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID" >> .env
           echo "ENV=$ENV" >> .env
           cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
           environment = "${{needs.deploy-ready.outputs.stage}}"
