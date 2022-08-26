@@ -223,7 +223,7 @@ jobs:
         env:
           cache-name: cache-dotenv-${{needs.deploy-ready.outputs.stage}}
         with:
-          path: '.env'
+          path: ./frontend/.env
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
       - name: cache tfvars
         if: ${{ success() }}
@@ -270,12 +270,11 @@ jobs:
       - name: cache dotenv
         if: ${{ success() }}
         id: dotenv-cache
-        working-directory: ./frontend
         uses: actions/cache@v3
         env:
           cache-name: cache-dotenv-${{needs.deploy-ready.outputs.stage}}
         with:
-          path: '.env'
+          path: ./frontend/.env
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
       - name: Build the stack
         if: ${{ success() }}
