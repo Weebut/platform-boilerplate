@@ -231,7 +231,7 @@ jobs:
         id: dotenv-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-dotenv-backend-${{needs.deploy-ready.outputs.stage}}
+          cache-name: cache-dotenv-back-${{needs.deploy-ready.outputs.stage}}
         with:
           path: ./backend/.env
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
@@ -282,7 +282,7 @@ jobs:
         id: dotenv-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-dotenv-backend-backend-${{needs.deploy-ready.outputs.stage}}
+          cache-name: cache-dotenv-back-${{needs.deploy-ready.outputs.stage}}
         with:
           path: ./backend/.env
           key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
