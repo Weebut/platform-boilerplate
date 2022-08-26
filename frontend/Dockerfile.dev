@@ -21,6 +21,4 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-COPY --chown=node:node ./entrypoint-dev.sh ./
-
-ENTRYPOINT [ "sh","/app/entrypoint-dev.sh" ]
+ENTRYPOINT [ "npm", "run", "dev" ]
