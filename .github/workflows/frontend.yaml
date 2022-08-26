@@ -7,14 +7,14 @@ on:
       - main
     paths:
       - '.github/workflows/frontend.yaml'
-      - './frontend/package.json'
-      - './frontend/entrypoint.sh'
-      - './frontend/package-lock.json'
-      - './frontend/nest-cli.json'
-      - './frontend/tsconfig*.json'
-      - './frontend/src'
-      - './frontend/docker-compose.yaml'
-      - './frontend/Dockerfile'
+      - 'frontend/package.json'
+      - 'frontend/entrypoint.sh'
+      - 'frontend/package-lock.json'
+      - 'frontend/nest-cli.json'
+      - 'frontend/tsconfig*.json'
+      - 'frontend/src'
+      - 'frontend/docker-compose.yaml'
+      - 'frontend/Dockerfile'
 
 jobs:
   deploy-ready:
@@ -46,16 +46,16 @@ jobs:
           base: ${{steps.extract_branch.outputs.branch}}
           filters: |
             app:
-              - "./frontend/package*.json"
-              - "./frontend/tsconfig*.json"
-              - "./frontend/src/**"
-              - "./frontend/Dockerfile"
-              - "./frontend/docker-compose.yaml"
-              - "./frontend/entrypoint.sh"
+              - "frontend/package*.json"
+              - "frontend/tsconfig*.json"
+              - "frontend/src/**"
+              - "frontend/Dockerfile"
+              - "frontend/docker-compose.yaml"
+              - "frontend/entrypoint.sh"
               - '.github/workflows/frontend.yaml'
             nginx:
-              - "./frontend/nginx/**"
-              - "./frontend/docker-compose.yaml"
+              - "frontend/nginx/**"
+              - "frontend/docker-compose.yaml"
               - '.github/workflows/frontend.yaml'
       - name: Prepare Slack Message
         id: slack-message-creator
