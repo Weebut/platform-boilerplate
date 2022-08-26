@@ -46,3 +46,28 @@ start-back-prod: ## Start the staging docker container.
 .PHONY: stop-back-prod
 stop-back-prod: ## Stop the staging docker container.
 	cd backend && docker compose down -v
+
+
+.PHONY: build-cms-dev
+build-cms-dev: ## Build the development docker image.
+	cd strapi && docker compose -f docker-compose.dev.yaml build
+
+.PHONY: start-cms-dev
+start-cms-dev: ## Start the development docker container.
+	cd strapi && docker compose -f docker-compose.dev.yaml up -d
+
+.PHONY: stop-cms-dev
+stop-cms-dev: ## Stop the development docker container.
+	cd strapi && docker compose -f docker-compose.dev.yaml down -v
+
+.PHONY: build-cms-prod
+build-cms-prod: ## Build the staging docker image.
+	cd strapi && docker compose build
+
+.PHONY: start-cms-prod
+start-cms-prod: ## Start the staging docker container.
+	cd strapi && docker compose up -d
+
+.PHONY: stop-cms-prod
+stop-cms-prod: ## Stop the staging docker container.
+	cd strapi && docker compose down -v

@@ -21,3 +21,9 @@
 | make build-back-prod  | `production`  | Build backend  |
 | make start-back-prod  | `production`  | Start backend  |
 | make stop-back-prod   | `production`  | Stop backend   |
+| make build-cms-dev    | `development` | Build CMS      |
+| make start-cms-dev    | `development` | Start CMS      |
+| make stop-cms-dev     | `development` | Stop CMS       |
+| make build-cms-prod   | `production`  | Build CMS      |
+| make start-cms-prod   | `production`  | Start CMS      |
+| make stop-cms-prod    | `production`  | Stop CMS       |

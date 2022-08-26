@@ -16,6 +16,8 @@ services:
       - mysqldata:/var/lib/mysql
     env_file:
       - .env
+    ports:
+      - 3306:3306
   redis:
     image: redis:${REDIS_VERSION:-7.0.4}
     restart: always

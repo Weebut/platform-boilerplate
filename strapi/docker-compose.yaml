@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  strapi:
+    container_name: strapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_VERSION=${NODE_VERSION:-16.14.2}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: mysql
+      DATABASE_HOST: localhost
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      NODE_ENV: prod
+    volumes:
+      - ./config:/opt/app/config
+      - ./src:/opt/app/src
+      - ./package.json:/opt/package.json
+      - ./package-lock.json:/opt/package-lock.json
+      - ./.env.development:/opt/app/.env
+    ports:
+      - 1337:1337
+    networks:
+      - strapi
