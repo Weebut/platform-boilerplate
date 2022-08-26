@@ -49,3 +49,34 @@ services:
     depends_on:
       - db
       - redis
+  strapi:
+    build:
+      context: ./strapi
+
+    environment:
+      DATABASE_CLIENT: mysql
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+      DATABASE_SSL: 'false'
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '1337:1337'
+    depends_on:
+      - mysql
+  strapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        - NODE_VERSION=${NODE_VERSION:-16.14.2}
+    container_name: app
+    restart: always
+    env_file:
+      - .env.development
+    depends_on:
+      - db
+      - redis

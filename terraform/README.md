@@ -26,11 +26,11 @@ Author: Jaemin Kim
 /path/to/nestjs-boilerplate/terraform % terraform apply -var-file="./vars/dev.tfvars"
 
 ## Each components setup
-/path/to/nestjs-boilerplate/terraform/sth % terraform init
-/path/to/nestjs-boilerplate/terraform/sth % terraform workspace new dev
-/path/to/nestjs-boilerplate/terraform/sth % terraform workspace select dev
-/path/to/nestjs-boilerplate/terraform/sth % terraform plan -var-file="../vars/dev.tfvars"
-/path/to/nestjs-boilerplate/terraform/sth % terraform apply -var-file="../vars/dev.tfvars"
+/path/to/nestjs-boilerplate/terraform/lightsail % terraform init
+/path/to/nestjs-boilerplate/terraform/lightsail % terraform workspace new dev
+/path/to/nestjs-boilerplate/terraform/lightsail % terraform workspace select dev
+/path/to/nestjs-boilerplate/terraform/lightsail % terraform apply -var-file="../vars/dev.tfvars" -target="awslightsail_certificate.cert"
+/path/to/nestjs-boilerplate/terraform/lightsail % terraform apply -var-file="../vars/dev.tfvars"
 
 ```
 
