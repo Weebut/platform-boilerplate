@@ -49,6 +49,8 @@ services:
     depends_on:
       - db
       - redis
+    volumes:
+      - ./backend:/app
   strapi:
     build:
       context: ./strapi
@@ -67,16 +69,3 @@ services:
       - '1337:1337'
     depends_on:
       - mysql
-  strapi:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      args:
-        - NODE_VERSION=${NODE_VERSION:-16.14.2}
-    container_name: app
-    restart: always
-    env_file:
-      - .env.development
-    depends_on:
-      - db
-      - redis

@@ -30,3 +30,5 @@ services:
     restart: always
     env_file:
       - .env.development
+    volumes:
+      - ./frontend:/app

@@ -279,7 +279,6 @@ jobs:
       - name: cache dotenv
         if: ${{ success() }}
         id: dotenv-cache
-        working-directory: ./backend
         uses: actions/cache@v3
         env:
           cache-name: cache-dotenv-${{needs.deploy-ready.outputs.stage}}
