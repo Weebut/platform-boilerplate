@@ -2,11 +2,11 @@ version: '3.8'
 
 services:
   nginx-front:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-      args:
-        - NGINX_VERSION=${NGINX_VERSION:-1.19}
+    # build:
+    #   context: ./nginx
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - NGINX_VERSION=${NGINX_VERSION:-1.19}
     image: ${ECR_REGISTRY}/${ECR_WEB_NGINX_REPOSITORY}:${NGINX_VERSION:-1.19}-${ENV:-dev}-${TAG:-latest}
     ports:
       - 80:80
@@ -15,11 +15,11 @@ services:
     depends_on:
       - web
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - NODE_VERSION=${NODE_VERSION:-16.14.2}
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - NODE_VERSION=${NODE_VERSION:-16.14.2}
     image: ${ECR_REGISTRY}/${ECR_WEB_REPOSITORY}:${NODE_VERSION:-16.14.2}-${ENV:-dev}-${TAG:-latest}
     restart: always
     ports:

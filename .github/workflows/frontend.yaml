@@ -355,7 +355,7 @@ jobs:
         run: terraform apply -auto-approve -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
 
   deploy-end:
-    name: deploy end notification
+    name: end notification
     runs-on: ubuntu-latest
     needs: [deploy-service, deploy-ready]
     steps:
