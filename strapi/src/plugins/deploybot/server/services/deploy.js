@@ -1,5 +1,6 @@
 'use strict';
 var fs = require('fs');
+const request = require('request');
 
 // s3 client and sync initialization
 const { S3 } = require('@aws-sdk/client-s3');
@@ -66,6 +67,30 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
+    request.post(
+      {
+        uri: `http://api.github.com/repos/${process.env.OWNER}/${process.env.REPO}/actions/workflows/strapi_console/dispatches`,
+        method: 'POST',
+        body: {
+          tag: deployment.id,
+          environment: process.env.ENV,
+        },
+        json: true,
+      },
+      function (error, response, body) {
+        if (response.statusCode !== 204) {
+          await strapi.entityService.update(
+            'plugin::deploybot.deployment',
+            deployment.id,
+            {
+              data: {
+                status: 'failed',
+              },
+            },
+          );
+        }
+      },
+    );
     return deployment;
   },
 
@@ -117,7 +142,7 @@ module.exports = ({ strapi }) => ({
       throw Error('이 배포는 사용할 수 없습니다.');
     }
 
-    await strapi.entityService.create('plugin::deploybot.deployment', {
+    const newDeployment = await strapi.entityService.create('plugin::deploybot.deployment', {
       data: {
         timestmap: new Date().getTime(),
         name: new Date().toLocaleString(),
@@ -132,6 +157,30 @@ module.exports = ({ strapi }) => ({
         filters: [{ exclude: (key) => ig.ignores(key) }],
         dryRun: true,
         monitor,
+      },
+    );
+    request.post(
+      {
+        uri: `http://api.github.com/repos/${process.env.OWNER}/${process.env.REPO}/actions/workflows/strapi_console/dispatches`,
+        method: 'POST',
+        body: {
+          tag: newDeployment.id,
+          environment: process.env.ENV,
+        },
+        json: true,
+      },
+      function (error, response, body) {
+        if (response.statusCode !== 204) {
+          await strapi.entityService.update(
+            'plugin::deploybot.deployment',
+            newDeployment.id,
+            {
+              data: {
+                status: 'failed',
+              },
+            },
+          );
+        }
       },
     );
     console.log(syncOps);

@@ -3,7 +3,7 @@ name: Lightsail Server Deploy
 on:
   push:
     branches:
-      - develop
+      - feature/cms
       - main
     paths:
       - '.github/workflows/strapi.yaml'
@@ -33,7 +33,7 @@ jobs:
         id: stage
         shell: bash
         run: |
-          if [ "${{steps.extract_branch.outputs.branch}}" == "develop" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
+          if [ "${{steps.extract_branch.outputs.branch}}" == "feature/cms" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
       - name: filter services
         uses: dorny/paths-filter@v2
         id: filter
@@ -139,6 +139,8 @@ jobs:
           STRAPI_MANAGER_DOMAIN: ${{ secrets.STRAPI_MANAGER_DOMAIN }}
           STRAPI_SUPERADMIN_DOMAIN: ${{ secrets.STRAPI_SUPERADMIN_DOMAIN }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
+          OWNER: ${{github.REPOSITORY_OWNER}}
+          REPO: ${{github.REPOSITORY}}
         run: |
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> .env
@@ -177,6 +179,9 @@ jobs:
                   AWS_SECRET_ACCESS_KEY = "$AWS_SECRET_ACCESS_KEY"
                   AWS_REGION = "$AWS_REGION"
                   STRAPI_S3_BUCKET = "$STRAPI_S3_BUCKET"
+                  ENV = "$ENV"
+                  OWNER = "$OWNER"
+                  REPO = "$REPO"
                 }
                 ports = {
                   "1337" = "HTTP"
@@ -234,6 +239,9 @@ jobs:
                   AWS_REGION = "$AWS_REGION"
                   STRAPI_S3_BUCKET = "$STRAPI_S3_BUCKET"
                   PORT = 1338
+                  ENV = "$ENV"
+                  OWNER = "$OWNER"
+                  REPO = "$REPO"
                 }
                 ports = {
                   "1338" = "HTTP"

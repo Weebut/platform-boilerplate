@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: 'test'
+          ref: feature/cms
       - name: Install AWS CLI 2
         if: success()
         run: |
@@ -90,7 +90,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: 'test'
+          ref: feature/cms
       - name: request update of manager CMS
         uses: fjogeleit/http-request-action@v1
         with:
