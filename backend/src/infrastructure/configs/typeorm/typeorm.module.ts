@@ -6,23 +6,44 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 export const getTypeOrmModuleOptions = (
   config: EnvironmentConfigService,
 ): TypeOrmModuleOptions => {
-  return {
-    type: 'mysql',
-    host: config.getDatabaseHost(),
-    port: config.getDatabasePort(),
-    username: config.getDatabaseUser(),
-    password: config.getDatabasePassword(),
-    database: config.getDatabaseName(),
-    entities: [],
-    autoLoadEntities: true,
-    logging: ['error', 'migration', 'schema'],
-    synchronize: config.getDatabaseSync(),
-    migrations: ['src/**/migrations/*.ts'],
-    migrationsTableName: 'migrations',
-    cli: {
-      migrationsDir: 'src/infrastructure/database/migrations',
+  return [
+    {
+      name: 'default',
+      type: 'mysql',
+      host: config.getDatabaseHost(),
+      port: config.getDatabasePort(),
+      username: 'root',
+      password: config.getDatabasePassword(),
+      database: config.getDatabaseName(),
+      entities: [],
+      autoLoadEntities: true,
+      logging: ['error', 'migration', 'schema'],
+      synchronize: config.getDatabaseSync(),
+      migrations: ['src/**/migrations/*.ts'],
+      migrationsTableName: 'migrations',
+      cli: {
+        migrationsDir: 'src/infrastructure/database/migrations',
+      },
     },
-  } as TypeOrmModuleOptions;
+    {
+      name: 'cms',
+      type: 'mysql',
+      host: config.getCMSHost(),
+      port: config.getCMSPort(),
+      username: 'root',
+      password: config.getCMSPassword(),
+      database: config.getCMSName(),
+      entities: [],
+      autoLoadEntities: true,
+      logging: ['error', 'migration', 'schema'],
+      synchronize: config.getCMSSync(),
+      migrations: ['src/**/migrations/*.ts'],
+      migrationsTableName: 'migrations',
+      cli: {
+        migrationsDir: 'src/infrastructure/database/migrations',
+      },
+    },
+  ] as TypeOrmModuleOptions;
 };
 
 @Module({

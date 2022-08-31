@@ -1,0 +1,34 @@
+upstream superadmin {
+  server ${STRAPI_SUPERADMIN_HOST}:1337;
+}
+upstream manager {
+  server ${STRAPI_MANAGER_HOST}:1338;
+}
+
+server {
+
+  listen 80 default_server;
+	server_name ${STRAPI_SUPERADMIN_DOMAIN};
+
+  location / {
+    proxy_pass http://superadmin;
+  }
+
+  location = /health {
+		return 200 'OK';
+  }
+}
+
+server {
+
+  listen 80;
+	server_name ${STRAPI_MANAGER_DOMAIN};
+
+  location / {
+    proxy_pass http://manager;
+  }
+
+  location = /health {
+		return 200 'OK';
+  }
+}

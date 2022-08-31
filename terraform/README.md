@@ -34,4 +34,4 @@ Author: Jaemin Kim
 
 ```
 
-각 terraform module 별 배포 순서는 ecr -> lightsail (여러번 해야함, certificate 설정을 기다리지 않음) -> (직접 lightsail 콘솔에서 이미지 설정) -> lightsail/deploy 이다
+각 terraform module 별 배포 순서는 ecr -> lightsail (여러번 해야함, certificate 설정을 기다리지 않음) -> (직접 lightsail 콘솔에서 이미지 설정, DB에 strapi database 설정) -> lightsail/deploy 이다

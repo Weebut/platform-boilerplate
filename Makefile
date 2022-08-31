@@ -1,14 +1,14 @@
 .PHONY: build-front-dev
 build-front-dev: ## Build the development docker image.
-	cd frontend && docker compose -f docker-compose.dev.yaml build
+	cd frontend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development build
 
 .PHONY: start-front-dev
 start-front-dev: ## Start the development docker container.
-	cd frontend && docker compose -f docker-compose.dev.yaml up -d
+	cd frontend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development up -d
 
 .PHONY: stop-front-dev
 stop-front-dev: ## Stop the development docker container.
-	cd frontend && docker compose -f docker-compose.dev.yaml down -v
+	cd frontend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development down -v
 
 .PHONY: build-front-prod
 build-front-prod: ## Build the staging docker image.
@@ -25,15 +25,15 @@ stop-front-prod: ## Stop the staging docker container.
 
 .PHONY: build-back-dev
 build-back-dev: ## Build the development docker image.
-	cd backend && docker compose -f docker-compose.dev.yaml build
+	cd backend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development build
 
 .PHONY: start-back-dev
 start-back-dev: ## Start the development docker container.
-	cd backend && docker compose -f docker-compose.dev.yaml up -d
+	cd backend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development up -d
 
 .PHONY: stop-back-dev
 stop-back-dev: ## Stop the development docker container.
-	cd backend && docker compose -f docker-compose.dev.yaml down -v
+	cd backend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development down -v
 
 .PHONY: build-back-prod
 build-back-prod: ## Build the staging docker image.
@@ -50,15 +50,15 @@ stop-back-prod: ## Stop the staging docker container.
 
 .PHONY: build-cms-dev
 build-cms-dev: ## Build the development docker image.
-	cd strapi && docker compose -f docker-compose.dev.yaml build
+	cd strapi && docker compose -f docker-compose.dev.yaml --env-file ./.env.development build
 
 .PHONY: start-cms-dev
 start-cms-dev: ## Start the development docker container.
-	cd strapi && docker compose -f docker-compose.dev.yaml up -d
+	cd strapi && docker compose -f docker-compose.dev.yaml --env-file ./.env.development up -d
 
 .PHONY: stop-cms-dev
 stop-cms-dev: ## Stop the development docker container.
-	cd strapi && docker compose -f docker-compose.dev.yaml down -v
+	cd strapi && docker compose -f docker-compose.dev.yaml --env-file ./.env.development down -v
 
 .PHONY: build-cms-prod
 build-cms-prod: ## Build the staging docker image.
