@@ -77,9 +77,10 @@ jobs:
           git push
       - name: mark this deployment as 'failure'
         if: failure()
-        shell: bash
-        run: |
-          curl -X PUT https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
 
   update-production:
     name: update manager CMS
@@ -91,9 +92,10 @@ jobs:
         with:
           ref: 'test'
       - name: request update of manager CMS
-        shell: bash
-        run: |
-          curl -X POST https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/restart/${{inputs.tag}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/restart/${{inputs.tag}}'
+          method: 'POST'
       - name: Send GitHub Action trigger data to Slack workflow
         id: slack-end
         uses: slackapi/slack-github-action@v1.21.0
@@ -122,11 +124,12 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
       - name: mark this deployment as 'failure'
         if: failure()
-        shell: bash
-        run: |
-          curl -X PUT https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
       - name: mark this deployment as 'success'
         if: success()
-        shell: bash
-        run: |
-          curl -X PUT https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'

@@ -54,7 +54,7 @@ services:
       - ./.gitignore:/opt/app/.gitignore
     ports:
       - 1337:1337
-      - 1339:8000
+      - 1340:8000
     networks:
       - strapinetwork
   strapi-manager:
@@ -77,5 +77,6 @@ services:
       NODE_ENV: production
     ports:
       - 1338:1337
+      - 1339:1339
     networks:
       - strapinetwork

@@ -135,7 +135,9 @@ jobs:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           ECR_STRAPI_NGINX_REPOSITORY: ${{ secrets.ECR_STRAPI_NGINX_REPOSITORY }}
           ECR_STRAPI_APP_REPOSITORY: ${{ secrets.ECR_STRAPI_APP_REPOSITORY }}
-          ECR_STRAPI_ADMIN_NGINX_REPOSITORY: ${{ secrets.ECR_STRAPI_ADMIN_NGINX_REPOSITORY }}
+          ECR_STRAPI_ADMIN_REPOSITORY: ${{ secrets.ECR_STRAPI_ADMIN_REPOSITORY }}
+          STRAPI_MANAGER_DOMAIN: ${{ secrets.STRAPI_MANAGER_DOMAIN }}
+          STRAPI_SUPERADMIN_DOMAIN: ${{ secrets.STRAPI_SUPERADMIN_DOMAIN }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
         run: |
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
@@ -152,7 +154,7 @@ jobs:
           echo "STRAPI_S3_BUCKET=$STRAPI_S3_BUCKET" >> .env
           echo "ECR_REGISTRY=$ECR_REGISTRY" >> .env
           echo "ECR_STRAPI_NGINX_REPOSITORY=$ECR_STRAPI_NGINX_REPOSITORY" >> .env
-          echo "ECR_STRAPI_ADMIN_NGINX_REPOSITORY=$ECR_STRAPI_ADMIN_NGINX_REPOSITORY" >> .env
+          echo "ECR_STRAPI_ADMIN_REPOSITORY=$ECR_STRAPI_ADMIN_REPOSITORY" >> .env
           echo "ECR_STRAPI_APP_REPOSITORY=$ECR_STRAPI_APP_REPOSITORY" >> .env
           echo "ENV=$ENV" >> .env
           cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
@@ -162,7 +164,7 @@ jobs:
               name = "cms"
               containers = [{
                 name = "strapi-superadmin"
-                image = "$ECR_REGISTRY/$ECR_STRAPI_ADMIN_NGINX_REPOSITORY:$NODE_VERSION-$ENV-latest"
+                image = "$ECR_REGISTRY/$ECR_STRAPI_ADMIN_REPOSITORY:$NODE_VERSION-$ENV-latest"
                 command = []
                 environment = {
                   APP_KEYS = "$APP_KEYS"
@@ -195,8 +197,10 @@ jobs:
                 image = "$ECR_REGISTRY/$ECR_SERVER_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
                 command = []
                 environment = {
-                  API_HOST = "localhost"
-                  API_DOMAIN = "$API_DOMAIN"
+                  STRAPI_MANAGER_HOST = "localhost"
+                  STRAPI_MANAGER_DOMAIN = "$STRAPI_MANAGER_DOMAIN"
+                  STRAPI_SUPERADMIN_HOST = "localhost"
+                  STRAPI_SUPERADMIN_DOMAIN = "$STRAPI_SUPERADMIN_DOMAIN"
                 }
                 ports = {
                   "80" = "HTTP"
@@ -231,6 +235,7 @@ jobs:
                 }
                 ports = {
                   "1338" = "HTTP"
+                  "1339" = "HTTP"
                 }
                 endpoint_port = -1
                 health_check = {

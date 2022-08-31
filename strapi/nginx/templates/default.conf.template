@@ -4,6 +4,9 @@ upstream superadmin {
 upstream manager {
   server ${STRAPI_MANAGER_HOST}:1338;
 }
+upstream manager_control {
+  server ${STRAPI_MANAGER_HOST}:1339;
+}
 
 server {
 
@@ -12,6 +15,10 @@ server {
 
   location / {
     proxy_pass http://superadmin;
+  }
+  location /manager-control {
+    rewrite ^/manager-control/?(.*)$ /$1 break;
+    proxy_pass http://manager_control;
   }
 
   location = /health {
