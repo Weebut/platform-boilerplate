@@ -201,6 +201,8 @@ jobs:
                   STRAPI_MANAGER_DOMAIN = "$STRAPI_MANAGER_DOMAIN"
                   STRAPI_SUPERADMIN_HOST = "localhost"
                   STRAPI_SUPERADMIN_DOMAIN = "$STRAPI_SUPERADMIN_DOMAIN"
+                  STRAPI_SUPERADMIN_HOSTING_PORT = "80"
+                  STRAPI_MANAGER_HOSTING_PORT = "80"
                 }
                 ports = {
                   "80" = "HTTP"

@@ -22,7 +22,7 @@ services:
   strapi-superadmin:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
         - NODE_VERSION=${NODE_VERSION:-16.14.2}
         - NODE_ENV=${NODE_ENV:-production}
