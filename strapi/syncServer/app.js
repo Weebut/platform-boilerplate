@@ -38,7 +38,7 @@ app.get('/:id', async (req, res) => {
     {
       monitor,
       del: true,
-      relocations: [`${req.params.id}`, ''],
+      relocations: [[`${req.params.id}`, '']],
       filters: [{ exclude: (key) => ig.ignores(key) }],
     },
   );
