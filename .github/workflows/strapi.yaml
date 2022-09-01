@@ -147,7 +147,7 @@ jobs:
           ECR_STRAPI_ADMIN_REPOSITORY: ${{ secrets.ECR_STRAPI_ADMIN_REPOSITORY }}
           STRAPI_MANAGER_DOMAIN: ${{ secrets.STRAPI_MANAGER_DOMAIN }}
           STRAPI_SUPERADMIN_DOMAIN: ${{ secrets.STRAPI_SUPERADMIN_DOMAIN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
           REPO: ${{github.REPOSITORY}}
         run: |
@@ -168,6 +168,7 @@ jobs:
           echo "ECR_STRAPI_NGINX_REPOSITORY=$ECR_STRAPI_NGINX_REPOSITORY" >> .env
           echo "ECR_STRAPI_ADMIN_REPOSITORY=$ECR_STRAPI_ADMIN_REPOSITORY" >> .env
           echo "ECR_STRAPI_APP_REPOSITORY=$ECR_STRAPI_APP_REPOSITORY" >> .env
+          echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> .env
           echo "ENV=$ENV" >> .env
           cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
           environment = "${{needs.deploy-ready.outputs.stage}}"
