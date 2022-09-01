@@ -207,7 +207,7 @@ jobs:
               },
               {
                 name = "nginx"
-                image = "$ECR_REGISTRY/$ECR_SERVER_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
+                image = "$ECR_REGISTRY/$ECR_STRAPI_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
                 command = []
                 environment = {
                   STRAPI_MANAGER_HOST = "localhost"
@@ -266,6 +266,7 @@ jobs:
                 }
                 is_public = false
               }
+            }
           ]
           EOL
       - name: cache dotenv
