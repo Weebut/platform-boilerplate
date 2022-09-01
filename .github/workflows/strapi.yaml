@@ -10,6 +10,7 @@ on:
       - 'strapi/**'
       - '!strapi/docker-compose.dev.yaml'
       - '!strapi/Dockerfile.dev'
+      - '!strapi/README.md'
 
 jobs:
   deploy-ready:
