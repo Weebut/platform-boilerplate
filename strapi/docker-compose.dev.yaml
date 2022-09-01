@@ -3,8 +3,6 @@ version: '3.8'
 volumes:
   nginxdata:
     driver: local
-  strapidata:
-    driver: local
 
 networks:
   strapinetwork:
@@ -56,7 +54,6 @@ services:
       - ./package-lock.json:/opt/package-lock.json
       - ./.env.development:/opt/app/.env
       - ./.gitignore:/opt/app/.gitignore
-      - strapidata:/opt/data:ro
     ports:
       - 1337:1337
       - 1340:8000
@@ -83,7 +80,5 @@ services:
     ports:
       - 1338:1337
       - 1339:1339
-    volumes:
-      - strapidata:/opt/app
     networks:
       - strapinetwork
