@@ -4,7 +4,7 @@ const app = express();
 
 const exec = require('child_process').exec;
 const PM2_CMD =
-  'cd /opt/app/syncServer && pm2 startOrRestart ecosystem.config.js';
+  'pm2 startOrRestart ecosystem.config.js && until [ "$(curl -X HEAD -o /dev/null -s -w "%{http_code}\n" http://localhost:1338/_health)" = 204 ]; do sleep 1; done';
 
 const { S3 } = require('@aws-sdk/client-s3');
 const { TransferMonitor } = require('s3-sync-client');
@@ -31,7 +31,10 @@ const ig = ignore().add(
     .filter((line) => line.length > 0 && line[0] !== '#'),
 );
 
-app.get('/:id', async (req, res) => {
+app.get('/manager-control/:id', async (req, res) => {
+  if (undefined === req.params.id) {
+    res.status(400).json({ text: 'fail' });
+  }
   await sync(
     `s3://${process.env.STRAPI_S3_BUCKET}/${req.params.id}`,
     '/opt/app',
@@ -39,17 +42,36 @@ app.get('/:id', async (req, res) => {
       monitor,
       del: true,
       relocations: [[`${req.params.id}`, '']],
-      filters: [{ exclude: (key) => ig.ignores(key) }],
+      filters: [
+        {
+          exclude: (key) => {
+            const flag = ig.ignores(key);
+            if (flag) console.log(key);
+            return flag;
+          },
+        },
+        {
+          exclude: (key) => {
+            const flag = key == '/syncServer/app.js';
+            if (flag) console.log(key);
+            return flag;
+          },
+        },
+      ],
     },
   );
   exec(`cd /opt/app && ${PM2_CMD}`, (error, stdout, stderr) => {
-    if (error) {
+    if (error || stderr) {
       console.error(`exec error: ${error}`);
-      res.send('fail');
+      res.status(400).json({ text: 'fail' });
     }
     console.log(`stdout: ${stdout}`);
     console.log(`stderr: ${stderr}`);
   });
+  res.send('success');
+});
+
+app.get('/health', async (req, res) => {
   res.send('success');
 });
 

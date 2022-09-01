@@ -45,10 +45,17 @@ jobs:
     name: detect change occurred from console and apply to repository
     runs-on: ubuntu-latest
     environment: ${{inputs.environment}}
+    needs: slack-notify
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: feature/cms
+          ref: ${{ github.ref }}
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 9
+          format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Install AWS CLI 2
         if: success()
         run: |
@@ -66,14 +73,25 @@ jobs:
       - name: pull files from s3
         if: success()
         shell: bash
+        working-directory: .
+        run: |
+          rm -rf aws
+          rm -rf awscliv2.zip
+      - name: remove unused files
+        if: success()
+        shell: bash
         working-directory: ./strapi
         run: |
-          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${inputs.tag} .
+          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${{inputs.tag}} .
       - name: add and push
         if: success()
         shell: bash
         run: |
+          git config --global user.name 'strapiAdmin'
+          git config --global user.email 'dev@weebut.com'
           git add -A
+          git commit -am "(strapi_console) deployment #${{inputs.tag}}: triggered at ${{steps.time.outputs.time}}"
+          git tag v1.0_admin_${{steps.time.outputs.time}}
           git push
       - name: mark this deployment as 'failure'
         if: failure()
@@ -90,12 +108,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: feature/cms
+          ref: ${{ github.ref }}
       - name: request update of manager CMS
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/restart/${{inputs.tag}}'
-          method: 'POST'
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/manager-control/${{inputs.tag}}'
+          method: 'GET'
+          timeout: 20000
       - name: Send GitHub Action trigger data to Slack workflow
         id: slack-end
         uses: slackapi/slack-github-action@v1.21.0
@@ -128,8 +147,11 @@ jobs:
         with:
           url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
           method: 'PUT'
+          timeout: 10000
       - name: mark this deployment as 'success'
         if: success()
         uses: fjogeleit/http-request-action@v1
         with:
           url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
+          method: 'PUT'
+          timeout: 10000

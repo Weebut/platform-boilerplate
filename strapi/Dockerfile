@@ -10,5 +10,8 @@ COPY ./package.json ./package-lock.json ./
 RUN npm install
 COPY ./ .
 RUN npm run build
-EXPOSE 1337
+EXPOSE 1338
+EXPOSE 1339
+
 ENTRYPOINT [ "bash", "/opt/app/entrypoint.sh" ]
+# CMD [ "sleep", "infinity" ]

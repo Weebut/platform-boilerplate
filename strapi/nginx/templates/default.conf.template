@@ -27,7 +27,6 @@ server {
     proxy_pass_request_headers on;
   }
   location /manager-control {
-    rewrite ^/manager-control/?(.*)$ /$1 break;
     proxy_pass http://manager_control;
     proxy_http_version 1.1;
     proxy_set_header X-Forwarded-Host $host;

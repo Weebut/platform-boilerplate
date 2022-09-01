@@ -1,8 +1,13 @@
 'use strict';
 var fs = require('fs');
 
-const { Octokit } = require('@octokit/core');
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const { request } = require('@octokit/request');
+const { createAppAuth } = require('@octokit/auth-app');
+const auth = createAppAuth({
+  appId: process.env.GH_APP_ID,
+  privateKey: process.env.GH_APP_SECRET_KEY,
+  installationId: process.env.GH_APP_INSTALLATION_ID,
+});
 
 // s3 client and sync initialization
 const { S3 } = require('@aws-sdk/client-s3');
@@ -69,13 +74,23 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
-    const response = await octokit.request(
+    const requestWithAuth = request.defaults({
+      request: {
+        hook: auth.hook,
+      },
+      mediaType: {
+        previews: ['machine-man'],
+      },
+    });
+    const { data: app } = await requestWithAuth('GET /app');
+    const response = await requestWithAuth(
       'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
       {
         owner: process.env.REPO.split('/')[0],
         repo: process.env.REPO.split('/')[1],
-        workflow_id: 'strapi_console',
-        client_payload: {
+        workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
+        ref: process.env.BRANCH,
+        inputs: {
           tag: deployment.id,
           environment: process.env.ENV,
         },
@@ -166,13 +181,15 @@ module.exports = ({ strapi }) => ({
       },
     );
 
-    const response = await octokit.request(
+    const { data: app } = await requestWithAuth('GET /app');
+    const response = await requestWithAuth(
       'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
       {
         owner: process.env.REPO.split('/')[0],
         repo: process.env.REPO.split('/')[1],
-        workflow_id: 'strapi_console',
-        client_payload: {
+        workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
+        ref: process.env.BRANCH,
+        inputs: {
           tag: deployment.id,
           environment: process.env.ENV,
         },
