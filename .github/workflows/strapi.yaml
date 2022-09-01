@@ -1,4 +1,4 @@
-name: Lightsail Server Deploy
+name: Lightsail CMS Deploy
 
 on:
   push:

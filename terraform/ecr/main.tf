@@ -72,3 +72,39 @@ resource "aws_ecr_repository" "client" {
 
   tags = local.tags
 }
+
+resource "aws_ecr_repository" "strapi" {
+  name                 = "strapi"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
+
+resource "aws_ecr_repository" "strapi_admin" {
+  name                 = "strapi-admin"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
+
+resource "aws_ecr_repository" "strapi_nginx" {
+  name                 = "strapi-nginx"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
