@@ -147,7 +147,7 @@ jobs:
           ECR_STRAPI_ADMIN_REPOSITORY: ${{ secrets.ECR_STRAPI_ADMIN_REPOSITORY }}
           STRAPI_MANAGER_DOMAIN: ${{ secrets.STRAPI_MANAGER_DOMAIN }}
           STRAPI_SUPERADMIN_DOMAIN: ${{ secrets.STRAPI_SUPERADMIN_DOMAIN }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
           REPO: ${{github.REPOSITORY}}
         run: |

@@ -2,7 +2,11 @@
 var fs = require('fs');
 
 const { Octokit } = require('@octokit/core');
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const { createActionAuth } = require('@octokit/auth-action');
+const octokit = new Octokit({
+  auth: process.env.GITHUB_TOKEN,
+  authStrategy: createActionAuth,
+});
 
 // s3 client and sync initialization
 const { S3 } = require('@aws-sdk/client-s3');
@@ -74,6 +78,7 @@ module.exports = ({ strapi }) => ({
       {
         owner: process.env.REPO.split('/')[0],
         repo: process.env.REPO.split('/')[1],
+        headers: 'Bearer ' + process.env.GITHUB_TOKEN,
         workflow_id: 'strapi_console',
         client_payload: {
           tag: deployment.id,
