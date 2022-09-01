@@ -18,7 +18,7 @@ export class EnvironmentConfigService {
   }
 
   getDatabasePassword(): string {
-    return this.configService.get<string>('MYSQL_PASSWORD');
+    return this.configService.get<string>('MYSQL_ROOT_PASSWORD');
   }
 
   getDatabaseName(): string {
@@ -27,6 +27,30 @@ export class EnvironmentConfigService {
 
   getDatabaseSync(): boolean {
     return this.configService.get<boolean>('DATABASE_SYNC');
+  }
+
+  getCMSHost(): string {
+    return this.configService.get<string>('CMS_HOST');
+  }
+
+  getCMSPort(): number {
+    return this.configService.get<number>('CMS_PORT');
+  }
+
+  getCMSUser(): string {
+    return this.configService.get<string>('CMS_USER');
+  }
+
+  getCMSPassword(): string {
+    return this.configService.get<string>('MYSQL_ROOT_PASSWORD');
+  }
+
+  getCMSName(): string {
+    return this.configService.get<string>('CMS_NAME');
+  }
+
+  getCMSSync(): boolean {
+    return this.configService.get<boolean>('CMS_SYNC');
   }
 
   getRedisHost(): string {

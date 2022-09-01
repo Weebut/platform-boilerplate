@@ -1,0 +1,135 @@
+name: strapi_console
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'S3 scenario tag (deployment id)'
+        required: true
+        type: number
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        type: string
+
+jobs:
+  slack-notify:
+    name: notify to slack channel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "콘솔에 의한 CMS 변경이 감지되었습니다",
+              "attachments": [
+                {
+                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "In Progress"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  detect-change-and-apply:
+    name: detect change occurred from console and apply to repository
+    runs-on: ubuntu-latest
+    environment: ${{inputs.environment}}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: feature/cms
+      - name: Install AWS CLI 2
+        if: success()
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          which aws
+          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+      - name: Configure AWS credentials
+        if: success()
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: pull files from s3
+        if: success()
+        shell: bash
+        working-directory: ./strapi
+        run: |
+          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${inputs.tag} .
+      - name: add and push
+        if: success()
+        shell: bash
+        run: |
+          git add -A
+          git push
+      - name: mark this deployment as 'failure'
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
+
+  update-production:
+    name: update manager CMS
+    runs-on: ubuntu-latest
+    needs: detect-change-and-apply
+    environment: ${{inputs.environment}}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: feature/cms
+      - name: request update of manager CMS
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/restart/${{inputs.tag}}'
+          method: 'POST'
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack-end
+        uses: slackapi/slack-github-action@v1.21.0
+        if: success()
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "콘솔에 의한 CMS 변경이 적용되었습니다",
+              "attachments": [
+                {
+                  "color": "#8fce00",
+                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "End"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: mark this deployment as 'failure'
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
+      - name: mark this deployment as 'success'
+        if: success()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'

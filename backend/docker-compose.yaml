@@ -11,6 +11,8 @@ volumes:
 services:
   db:
     image: mysql:${MYSQL_VERSION:-8.0.27}
+    cap_add:
+      - SYS_NICE
     restart: always
     volumes:
       - mysqldata:/var/lib/mysql
