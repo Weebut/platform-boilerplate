@@ -1,6 +1,6 @@
 'use strict';
 var fs = require('fs');
-const request = require('request');
+const axios = require('axios').default;
 
 // s3 client and sync initialization
 const { S3 } = require('@aws-sdk/client-s3');
@@ -67,21 +67,23 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
-    request.post(
-      {
-        uri: `http://api.github.com/repos/${process.env.REPO||'default'}/actions/workflows/strapi_console/dispatches`,
-        method: 'POST',
-        body: {
-          tag: deployment.id,
-          environment: process.env.ENV,
+    axios
+      .post(
+        `http://api.github.com/repos/${
+          process.env.REPO || 'default'
+        }/actions/workflows/strapi_console/dispatches`,
+        {
+          data: {
+            tag: deployment.id,
+            environment: process.env.ENV,
+          },
         },
-        json: true,
-      },
-      function (error, response, body) {
-        if (response.statusCode !== 204) {
+      )
+      .then(async (response) => {
+        if (response.status !== 204) {
           await strapi.entityService.update(
             'plugin::deploybot.deployment',
-            deployment.id,
+            newDeployment.id,
             {
               data: {
                 status: 'failed',
@@ -89,8 +91,7 @@ module.exports = ({ strapi }) => ({
             },
           );
         }
-      },
-    );
+      });
     return deployment;
   },
 
@@ -142,14 +143,17 @@ module.exports = ({ strapi }) => ({
       throw Error('이 배포는 사용할 수 없습니다.');
     }
 
-    const newDeployment = await strapi.entityService.create('plugin::deploybot.deployment', {
-      data: {
-        timestmap: new Date().getTime(),
-        name: new Date().toLocaleString(),
-        parent: deployment.parent || id,
-        status: 'pending',
+    const newDeployment = await strapi.entityService.create(
+      'plugin::deploybot.deployment',
+      {
+        data: {
+          timestmap: new Date().getTime(),
+          name: new Date().toLocaleString(),
+          parent: deployment.parent || id,
+          status: 'pending',
+        },
       },
-    });
+    );
     const syncOps = await sync(
       '/opt/app',
       `s3://${process.env.STRAPI_S3_BUCKET}/${deployment.id}`,
@@ -159,18 +163,20 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
-    request.post(
-      {
-        uri: `http://api.github.com/repos/${process.env.REPO||'default'}/actions/workflows/strapi_console/dispatches`,
-        method: 'POST',
-        body: {
-          tag: newDeployment.id,
-          environment: process.env.ENV,
+    axios
+      .post(
+        `http://api.github.com/repos/${
+          process.env.REPO || 'default'
+        }/actions/workflows/strapi_console/dispatches`,
+        {
+          data: {
+            tag: deployment.id,
+            environment: process.env.ENV,
+          },
         },
-        json: true,
-      },
-      function (error, response, body) {
-        if (response.statusCode !== 204) {
+      )
+      .then(async (response) => {
+        if (response.status !== 204) {
           await strapi.entityService.update(
             'plugin::deploybot.deployment',
             newDeployment.id,
@@ -181,8 +187,7 @@ module.exports = ({ strapi }) => ({
             },
           );
         }
-      },
-    );
+      });
     console.log(syncOps);
     return deployment;
   },
