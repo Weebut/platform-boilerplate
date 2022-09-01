@@ -1,0 +1,387 @@
+name: Lightsail Server Deploy
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - '.github/workflows/backend.yaml'
+      - 'backend/package.json'
+      - 'backend/entrypoint.sh'
+      - 'backend/package-lock.json'
+      - 'backend/nest-cli.json'
+      - 'backend/tsconfig*.json'
+      - 'backend/src/**'
+      - 'backend/docker-compose.yaml'
+      - 'backend/Dockerfile'
+
+jobs:
+  deploy-ready:
+    name: deployment-ready
+    runs-on: ubuntu-latest
+    outputs:
+      nginx: ${{ steps.filter.outputs.nginx }}
+      app: ${{ steps.filter.outputs.app }}
+      services: ${{ steps.slack-message-creator.outputs.services }}
+      branch: ${{ steps.extract_branch.outputs.branch }}
+      stage: ${{ steps.stage.outputs.stage }}
+      slack-message: ${{ steps.slack-message-creator.outputs.slack-message }}
+      ts: ${{ steps.slack.outputs.ts }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - name: Extract stage
+        id: stage
+        shell: bash
+        run: |
+          if [ "${{steps.extract_branch.outputs.branch}}" == "develop" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
+      - name: filter services
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: ${{steps.extract_branch.outputs.branch}}
+          filters: |
+            app:
+              - "backend/package*.json"
+              - "backend/tsconfig*.json"
+              - "backend/src/**"
+              - "backend/Dockerfile"
+              - "backend/docker-compose.yaml"
+              - "backend/entrypoint.sh"
+              - '.github/workflows/backend.yaml'
+            nginx:
+              - "backend/nginx/**"
+              - "backend/docker-compose.yaml"
+              - '.github/workflows/backend.yaml'
+      - name: Prepare Slack Message
+        id: slack-message-creator
+        shell: bash
+        run: |
+          SLACK_MESSAGE=""
+
+          SOURCE_FLAGS=("${{ steps.filter.outputs.nginx }}" "${{ steps.filter.outputs.app }}")
+          SOURCES=("nginx-back" "app")
+          UPDATED_SOURCES=""
+          for i in "${!SOURCE_FLAGS[@]}"; do
+            echo ${SOURCE_FLAGS[i]}
+            if [[ "${SOURCE_FLAGS[i]}" == "true" ]]; then
+              echo "true"
+              SLACK_MESSAGE+=" - ${SOURCES[i]}\n"
+              UPDATED_SOURCES+="${SOURCES[i]} "
+            else
+              echo "false"
+            fi
+          done
+          echo "::set-output name=slack-message::${SLACK_MESSAGE}"
+          echo "::set-output name=services::${UPDATED_SOURCES}"
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "서버 배포가 시작되었습니다. 약 10분 정도가 소요됩니다",
+              "attachments": [
+                {
+                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{steps.stage.outputs.stage}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
+                  "fields": [
+                    {
+                      "title": "Services",
+                      "short": true,
+                      "value": "${{steps.slack-message-creator.outputs.slack-message}}"
+                    },
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "In Progress"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  prepare-dotenv:
+    name: prepare dotenv file
+    runs-on: ubuntu-latest
+    needs: deploy-ready
+    environment: ${{needs.deploy-ready.outputs.stage}}
+    if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: Create dotenv .env
+        shell: bash
+        working-directory: ./backend
+        env:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          DATABASE_SYNC: ${{ secrets.DATABASE_SYNC }}
+          DATABASE_MIGRATION: ${{ secrets.DATABASE_MIGRATION }}
+          API_PORT: ${{ secrets.API_PORT }}
+          API_DOMAIN: ${{ secrets.API_DOMAIN }}
+          NGINX_VERSION: ${{ secrets.NGINX_VERSION }}
+          MYSQL_VERSION: ${{ secrets.MYSQL_VERSION }}
+          REDIS_VERSION: ${{ secrets.REDIS_VERSION }}
+          NODE_VERSION: ${{ secrets.NODE_VERSION }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_SERVER_REPOSITORY: ${{ secrets.ECR_SERVER_REPOSITORY }}
+          ECR_SERVER_NGINX_REPOSITORY: ${{ secrets.ECR_SERVER_NGINX_REPOSITORY }}
+          ENV: ${{needs.deploy-ready.outputs.stage}}
+        run: |
+          echo "NGINX_VERSION=$NGINX_VERSION" >> .env
+          echo "NODE_VERSION=$NODE_VERSION" >> .env
+          echo "REDIS_VERSION=$REDIS_VERSION" >> .env
+          echo "ECR_REGISTRY=$ECR_REGISTRY" >> .env
+          echo "ECR_SERVER_REPOSITORY=$ECR_SERVER_REPOSITORY" >> .env
+          echo "ECR_SERVER_NGINX_REPOSITORY=$ECR_SERVER_NGINX_REPOSITORY" >> .env
+          echo "ENV=$ENV" >> .env
+          cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
+          environment = "${{needs.deploy-ready.outputs.stage}}"
+          container_deployments = [
+            {
+              name = "server"
+              containers = [{
+                name = "app"
+                image = "$ECR_REGISTRY/$ECR_SERVER_REPOSITORY:$NODE_VERSION-$ENV-latest"
+                command = []
+                environment = {
+                  MYSQL_DATABASE = "$MYSQL_DATABASE"
+                  MYSQL_PASSWORD = "$MYSQL_PASSWORD"
+                  MYSQL_USER = "$MYSQL_USER"
+                  DATABASE_SYNC = "$DATABASE_SYNC"
+                  DATABASE_MIGRATION = "$DATABASE_MIGRATION"
+                  REDIS_HOST = "localhost"
+                  API_PORT = $API_PORT
+                }
+                ports = {
+                  "$API_PORT" = "HTTP"
+                }
+                endpoint_port = -1
+                health_check = {
+                  healthy_threshold = -1
+                  unhealthy_threshold = -1
+                  timeout_seconds = -1
+                  interval_seconds = -1
+                  path  = "/health"
+                  success_codes = "200"
+                }
+                is_public = false
+              },
+              {
+                name = "nginx"
+                image = "$ECR_REGISTRY/$ECR_SERVER_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
+                command = []
+                environment = {
+                  API_HOST = "localhost"
+                  API_DOMAIN = "$API_DOMAIN"
+                }
+                ports = {
+                  "80" = "HTTP"
+                }
+                endpoint_port = 80
+                health_check = {
+                  healthy_threshold = 2
+                  unhealthy_threshold = 5
+                  timeout_seconds = 10
+                  interval_seconds = 15
+                  path  = "/health"
+                  success_codes = "200"
+                }
+                is_public = true
+              },
+              {
+                name = "redis"
+                image = "redis:$REDIS_VERSION"
+                command = []
+                environment = {}
+                ports = {
+                  "6379" = "TCP"
+                }
+                endpoint_port = -1
+                health_check = {
+                  healthy_threshold = -1
+                  unhealthy_threshold = -1
+                  timeout_seconds = -1
+                  interval_seconds = -1
+                  path  = "/health"
+                  success_codes = "200"
+                }
+                is_public = false
+              }]
+            }
+          ]
+          EOL
+      - name: cache dotenv
+        if: ${{ success() }}
+        id: dotenv-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-dotenv-back-${{needs.deploy-ready.outputs.stage}}
+        with:
+          path: ./backend/.env
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
+      - name: cache tfvars
+        if: ${{ success() }}
+        id: tfvars-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-tfvars-back-${{needs.deploy-ready.outputs.stage}}
+        with:
+          path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
+
+  image-prepare:
+    name: image preparation start
+    runs-on: ubuntu-latest
+    needs: [prepare-dotenv, deploy-ready]
+    environment: ${{needs.deploy-ready.outputs.stage}}
+    if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up QEMU
+        if: ${{ success() }}
+        uses: docker/setup-qemu-action@v2
+      - name: Get Time
+        if: ${{ success() }}
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 9
+          format: 'YYYY-MM-DD-HH-mm-ss'
+      - name: Set up Docker Buildx
+        if: ${{ success() }}
+        uses: docker/setup-buildx-action@v2
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: cache dotenv
+        if: ${{ success() }}
+        id: dotenv-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-dotenv-back-${{needs.deploy-ready.outputs.stage}}
+        with:
+          path: ./backend/.env
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
+      - name: Build the stack
+        if: ${{ success() }}
+        working-directory: ./backend
+        run: TAG=${{steps.time.outputs.time}} docker compose build
+      - name: Push the stack
+        if: ${{ success() }}
+        working-directory: ./backend
+        run: TAG=${{steps.time.outputs.time}} docker compose push ${{needs.deploy-ready.outputs.services}}
+      - name: Build the stack latest
+        if: ${{ success() }}
+        working-directory: ./backend
+        run: docker compose build
+      - name: Push the stack latest
+        if: ${{ success() }}
+        working-directory: ./backend
+        run: docker compose push ${{needs.deploy-ready.outputs.services}}
+
+  deploy-service:
+    name: service deployment
+    runs-on: ubuntu-latest
+    needs: [image-prepare, deploy-ready]
+    environment: ${{needs.deploy-ready.outputs.stage}}
+    if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+        if: ${{ success() }}
+      - name: Configure AWS Credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: cache tfvars
+        id: tfvars-cache
+        if: ${{ success() }}
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-tfvars-back-${{needs.deploy-ready.outputs.stage}}
+        with:
+          path: ./terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{needs.deploy-ready.outputs.stage}}-${{ github.SHA }}
+      - run: terraform init -backend-config="key=lightsail-server-deploy"
+        if: ${{ success() }}
+        working-directory: ./terraform/lightsail/deploy
+      - run: terraform workspace new ${{needs.deploy-ready.outputs.stage}}
+        working-directory: ./terraform/lightsail/deploy
+        continue-on-error: true
+      - run: terraform workspace select ${{needs.deploy-ready.outputs.stage}}
+        working-directory: ./terraform/lightsail/deploy
+        continue-on-error: true
+      - name: Terraform Plan
+        id: plan
+        if: ${{ success() }}
+        working-directory: ./terraform/lightsail/deploy
+        run: terraform plan -no-color -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
+      - name: Terraform Apply
+        id: apply
+        if: ${{ success() }}
+        working-directory: ./terraform/lightsail/deploy
+        run: terraform apply -auto-approve -var-file="../../vars/${{needs.deploy-ready.outputs.stage}}.tfvars"
+
+  deploy-end:
+    name: deploy end notification
+    runs-on: ubuntu-latest
+    needs: [deploy-service, deploy-ready]
+    steps:
+      - uses: actions/checkout@v3
+      - name: status save - success
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          update-ts: ${{ needs.deploy-ready.outputs.ts }}
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "서버 배포가 완료되었습니다",
+              "attachments": [
+                {
+                  "color": "#8fce00",
+                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{needs.deploy-ready.outputs.stage}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
+                  "fields": [
+                    {
+                      "title": "Services",
+                      "short": true,
+                      "value": "${{needs.deploy-ready.outputs.slack-message}}"
+                    },
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "Success"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

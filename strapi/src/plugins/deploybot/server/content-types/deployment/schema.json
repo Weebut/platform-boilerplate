@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "deployments",
+  "info": {
+    "singularName": "deployment",
+    "pluralName": "deployments",
+    "displayName": "deployment"
+  },
+  "options": {
+    "draftAndPublish": false,
+    "comment": ""
+  },
+  "attributes": {
+    "timestamp": {
+      "type": "timestamp"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "failed",
+        "succeeded"
+      ]
+    },
+    "parent": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "text",
+      "minLength": 3,
+      "maxLength": 40,
+      "unique": true
+    }
+  }
+}

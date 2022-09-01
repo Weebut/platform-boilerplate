@@ -1,0 +1,55 @@
+version: '3.8'
+
+volumes:
+  mysqldata:
+    driver: local
+  redisdata:
+    driver: local
+  nginxdata:
+    driver: local
+
+services:
+  db:
+    image: mysql:${MYSQL_VERSION:-8.0.27}
+    cap_add:
+      - SYS_NICE
+    restart: always
+    volumes:
+      - mysqldata:/var/lib/mysql
+    env_file:
+      - .env
+    ports:
+      - 3306:3306
+  redis:
+    image: redis:${REDIS_VERSION:-7.0.4}
+    restart: always
+    volumes:
+      - redisdata:/data
+  nginx-back:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+      args:
+        - NGINX_VERSION=${NGINX_VERSION:-1.19}
+    image: ${ECR_REGISTRY}/${ECR_SERVER_NGINX_REPOSITORY}:${NGINX_VERSION:-1.19}-${ENV:-dev}-${TAG:-latest}
+    ports:
+      - 80:80
+    env_file:
+      - .env
+    depends_on:
+      - app
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_VERSION=${NODE_VERSION:-16.14.2}
+    image: ${ECR_REGISTRY}/${ECR_SERVER_REPOSITORY}:${NODE_VERSION:-16.14.2}-${ENV:-dev}-${TAG:-latest}
+    restart: always
+    ports:
+      - ${API_PORT:-4000}:4000
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis

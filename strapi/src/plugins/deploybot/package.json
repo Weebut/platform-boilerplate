@@ -1,0 +1,30 @@
+{
+  "name": "deploybot",
+  "version": "1.0.0",
+  "description": "This is the description of the plugin.",
+  "strapi": {
+    "name": "deploybot",
+    "description": "Description of Deploybot plugin",
+    "kind": "plugin",
+    "displayName": "Deploybot"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.160.0",
+    "@octokit/core": "^4.0.5",
+    "ignore": "^5.2.0",
+    "s3-sync-client": "^3.0.3"
+  },
+  "author": {
+    "name": "A Strapi developer"
+  },
+  "maintainers": [
+    {
+      "name": "A Strapi developer"
+    }
+  ],
+  "engines": {
+    "node": ">=14.19.1 <=16.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}

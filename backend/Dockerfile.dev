@@ -1,0 +1,15 @@
+ARG NODE_VERSION
+FROM node:${NODE_VERSION}-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY ./src ./src
+COPY ./nest-cli.json ./
+COPY ./tsconfig*.json ./
+COPY --chown=node:node ./entrypoint-dev.sh ./
+
+ENTRYPOINT [ "sh","/app/entrypoint-dev.sh" ]
