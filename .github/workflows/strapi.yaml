@@ -147,6 +147,7 @@ jobs:
           ECR_STRAPI_ADMIN_REPOSITORY: ${{ secrets.ECR_STRAPI_ADMIN_REPOSITORY }}
           STRAPI_MANAGER_DOMAIN: ${{ secrets.STRAPI_MANAGER_DOMAIN }}
           STRAPI_SUPERADMIN_DOMAIN: ${{ secrets.STRAPI_SUPERADMIN_DOMAIN }}
+          GITHUB_TOKEN: ${{ github.token }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
           REPO: ${{github.REPOSITORY}}
         run: |
@@ -192,6 +193,7 @@ jobs:
                     ENV = "$ENV"
                     REPO = "$REPO"
                     DATABASE_HOST = "$DATABASE_HOST"
+                    GITHUB_TOKEN = "$GITHUB_TOKEN"
                   }
                   ports = {
                     "1337" = "HTTP"
@@ -252,6 +254,7 @@ jobs:
                     ENV = "$ENV"
                     REPO = "$REPO"
                     DATABASE_HOST = "$DATABASE_HOST"
+                    GITHUB_TOKEN = "$GITHUB_TOKEN"
                   }
                   ports = {
                     "1338" = "HTTP"

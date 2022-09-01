@@ -1,6 +1,8 @@
 'use strict';
 var fs = require('fs');
-const axios = require('axios').default;
+
+const { Octokit } = require('octokit');
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 // s3 client and sync initialization
 const { S3 } = require('@aws-sdk/client-s3');
@@ -67,31 +69,31 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
-    axios
-      .post(
-        `http://api.github.com/repos/${
-          process.env.REPO || 'default'
-        }/actions/workflows/strapi_console/dispatches`,
+    const response = await octokit.request(
+      'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+      {
+        owner: process.env.REPO.split('/')[0],
+        repo: process.env.REPO.split('/')[1],
+        workflow_id: 'strapi_console',
+        client_payload: {
+          tag: deployment.id,
+          environment: process.env.ENV,
+        },
+      },
+    );
+
+    if (response.status !== 204) {
+      await strapi.entityService.update(
+        'plugin::deploybot.deployment',
+        newDeployment.id,
         {
           data: {
-            tag: deployment.id,
-            environment: process.env.ENV,
+            status: 'failed',
           },
         },
-      )
-      .then(async (response) => {
-        if (response.status !== 204) {
-          await strapi.entityService.update(
-            'plugin::deploybot.deployment',
-            newDeployment.id,
-            {
-              data: {
-                status: 'failed',
-              },
-            },
-          );
-        }
-      });
+      );
+    }
+
     return deployment;
   },
 
@@ -163,31 +165,32 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
-    axios
-      .post(
-        `http://api.github.com/repos/${
-          process.env.REPO || 'default'
-        }/actions/workflows/strapi_console/dispatches`,
+
+    const response = await octokit.request(
+      'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+      {
+        owner: process.env.REPO.split('/')[0],
+        repo: process.env.REPO.split('/')[1],
+        workflow_id: 'strapi_console',
+        client_payload: {
+          tag: deployment.id,
+          environment: process.env.ENV,
+        },
+      },
+    );
+
+    if (response.status !== 204) {
+      await strapi.entityService.update(
+        'plugin::deploybot.deployment',
+        newDeployment.id,
         {
           data: {
-            tag: deployment.id,
-            environment: process.env.ENV,
+            status: 'failed',
           },
         },
-      )
-      .then(async (response) => {
-        if (response.status !== 204) {
-          await strapi.entityService.update(
-            'plugin::deploybot.deployment',
-            newDeployment.id,
-            {
-              data: {
-                status: 'failed',
-              },
-            },
-          );
-        }
-      });
+      );
+    }
+
     console.log(syncOps);
     return deployment;
   },
