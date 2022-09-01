@@ -4,6 +4,11 @@ volumes:
   nginxdata:
     driver: local
 
+networks:
+  strapinetwork:
+    name: strapinetwork
+    external: true
+
 services:
   nginx-strapi:
     build:
@@ -19,6 +24,8 @@ services:
     depends_on:
       - strapi-superadmin
       - strapi-manager
+    networks:
+      - strapinetwork
   strapi-superadmin:
     build:
       context: .
@@ -31,6 +38,8 @@ services:
     env_file: .env
     ports:
       - 1337:1337
+    networks:
+      - strapinetwork
   strapi-manager:
     build:
       context: .
@@ -44,3 +53,5 @@ services:
     ports:
       - 1338:1337
       - 1339:1338
+    networks:
+      - strapinetwork

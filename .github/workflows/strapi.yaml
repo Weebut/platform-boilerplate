@@ -128,6 +128,7 @@ jobs:
         shell: bash
         working-directory: ./strapi
         env:
+          DATABASE_HOST: ${{ secrets.MYSQL_DATABASE }}
           DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           APP_KEYS: ${{ secrets.APP_KEYS }}
@@ -147,9 +148,9 @@ jobs:
           STRAPI_MANAGER_DOMAIN: ${{ secrets.STRAPI_MANAGER_DOMAIN }}
           STRAPI_SUPERADMIN_DOMAIN: ${{ secrets.STRAPI_SUPERADMIN_DOMAIN }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
-          OWNER: ${{github.REPOSITORY_OWNER}}
           REPO: ${{github.REPOSITORY}}
         run: |
+          echo "DATABASE_HOST=$DATABASE_HOST" >> .env
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> .env
           echo "APP_KEYS=$APP_KEYS" >> .env
@@ -189,8 +190,8 @@ jobs:
                     AWS_REGION = "$AWS_REGION"
                     STRAPI_S3_BUCKET = "$STRAPI_S3_BUCKET"
                     ENV = "$ENV"
-                    OWNER = "$OWNER"
                     REPO = "$REPO"
+                    DATABASE_HOST = "$DATABASE_HOST"
                   }
                   ports = {
                     "1337" = "HTTP"
@@ -249,8 +250,8 @@ jobs:
                     STRAPI_S3_BUCKET = "$STRAPI_S3_BUCKET"
                     PORT = 1338
                     ENV = "$ENV"
-                    OWNER = "$OWNER"
                     REPO = "$REPO"
+                    DATABASE_HOST = "$DATABASE_HOST"
                   }
                   ports = {
                     "1338" = "HTTP"

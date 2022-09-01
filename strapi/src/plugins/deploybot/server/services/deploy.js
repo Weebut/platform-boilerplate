@@ -69,7 +69,7 @@ module.exports = ({ strapi }) => ({
     );
     request.post(
       {
-        uri: `http://api.github.com/repos/${process.env.OWNER||'default'}/${process.env.REPO||'default'}/actions/workflows/strapi_console/dispatches`,
+        uri: `http://api.github.com/repos/${process.env.REPO||'default'}/actions/workflows/strapi_console/dispatches`,
         method: 'POST',
         body: {
           tag: deployment.id,
@@ -161,7 +161,7 @@ module.exports = ({ strapi }) => ({
     );
     request.post(
       {
-        uri: `http://api.github.com/repos/${process.env.OWNER||'default'}/${process.env.REPO||'default'}/actions/workflows/strapi_console/dispatches`,
+        uri: `http://api.github.com/repos/${process.env.REPO||'default'}/actions/workflows/strapi_console/dispatches`,
         method: 'POST',
         body: {
           tag: newDeployment.id,
