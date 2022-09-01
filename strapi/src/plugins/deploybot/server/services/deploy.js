@@ -1,7 +1,7 @@
 'use strict';
 var fs = require('fs');
 
-const { Octokit } = require('octokit');
+const { Octokit } = require('@octokit/core');
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 // s3 client and sync initialization

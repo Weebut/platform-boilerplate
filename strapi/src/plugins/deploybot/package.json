@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.160.0",
+    "@octokit/core": "^4.0.5",
     "ignore": "^5.2.0",
-    "octokit": "^2.0.7",
     "s3-sync-client": "^3.0.3"
   },
   "author": {
