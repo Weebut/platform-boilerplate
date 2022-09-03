@@ -5,7 +5,7 @@ const { request } = require('@octokit/request');
 const { createAppAuth } = require('@octokit/auth-app');
 const auth = createAppAuth({
   appId: process.env.GH_APP_ID,
-  privateKey: process.env.GH_APP_SECRET_KEY,
+  privateKey: process.env.GH_APP_SECRET_KEY.replaceAll('\\n', '\n'),
   installationId: process.env.GH_APP_INSTALLATION_ID,
 });
 
@@ -91,7 +91,7 @@ module.exports = ({ strapi }) => ({
         workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
         ref: process.env.BRANCH,
         inputs: {
-          tag: deployment.id,
+          tag: deployment.id.toString(),
           environment: process.env.ENV,
         },
       },
@@ -190,7 +190,7 @@ module.exports = ({ strapi }) => ({
         workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
         ref: process.env.BRANCH,
         inputs: {
-          tag: deployment.id,
+          tag: deployment.id.toString(),
           environment: process.env.ENV,
         },
       },
