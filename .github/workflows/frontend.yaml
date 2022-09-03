@@ -298,7 +298,7 @@ jobs:
       - name: Push the stack
         if: ${{ success() }}
         working-directory: ./frontend
-        run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose push ${{needs.deploy-ready.outputs.services}}
+        run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose push
       - name: Build the stack latest
         if: ${{ success() }}
         working-directory: ./frontend
