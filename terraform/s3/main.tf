@@ -39,3 +39,14 @@ resource "aws_s3_bucket_acl" "b" {
   bucket = aws_s3_bucket.b.id
   acl    = "private"
 }
+
+resource "aws_s3_bucket" "c" {
+  bucket = "${var.environment}-init-strapi-upload-bucket"
+
+  tags = local.tags
+}
+
+resource "aws_s3_bucket_acl" "c" {
+  bucket = aws_s3_bucket.c.id
+  acl    = "private"
+}

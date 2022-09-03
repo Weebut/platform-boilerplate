@@ -113,6 +113,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-ready
     if: ${{ (needs.deploy-ready.outputs.app == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+    outputs:
+      time: ${{steps.time.outputs.time}}
     environment: ${{needs.deploy-ready.outputs.stage}}
     steps:
       - uses: actions/checkout@v3
@@ -123,6 +125,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+      - name: Get Time
+        if: ${{ success() }}
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 9
+          format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Create dotenv .env
         shell: bash
         working-directory: ./frontend
@@ -170,7 +179,7 @@ jobs:
               name = "client"
               containers = [{
                 name = "app"
-                image = "$ECR_REGISTRY/$ECR_WEB_REPOSITORY:$NODE_VERSION-$ENV-latest"
+                image = "$ECR_REGISTRY/$ECR_WEB_REPOSITORY:$NODE_VERSION-$ENV-${{steps.time.outputs.time}}"
                 command = []
                 environment = {
                   API_BASE_URL = "$API_BASE_URL"
@@ -206,7 +215,7 @@ jobs:
               },
               {
                 name = "nginx"
-                image = "$ECR_REGISTRY/$ECR_WEB_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
+                image = "$ECR_REGISTRY/$ECR_WEB_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-${{steps.time.outputs.time}}"
                 command = []
                 environment = {
                   WEB_HOST = "localhost"
@@ -259,13 +268,6 @@ jobs:
       - name: Set up QEMU
         if: ${{ success() }}
         uses: docker/setup-qemu-action@v2
-      - name: Get Time
-        if: ${{ success() }}
-        id: time
-        uses: nanzm/get-time-action@v1.1
-        with:
-          timeZone: 9
-          format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Set up Docker Buildx
         if: ${{ success() }}
         uses: docker/setup-buildx-action@v2
@@ -292,11 +294,11 @@ jobs:
       - name: Build the stack
         if: ${{ success() }}
         working-directory: ./frontend
-        run: TAG=${{steps.time.outputs.time}} docker compose build
+        run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose build
       - name: Push the stack
         if: ${{ success() }}
         working-directory: ./frontend
-        run: TAG=${{steps.time.outputs.time}} docker compose push ${{needs.deploy-ready.outputs.services}}
+        run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose push ${{needs.deploy-ready.outputs.services}}
       - name: Build the stack latest
         if: ${{ success() }}
         working-directory: ./frontend
