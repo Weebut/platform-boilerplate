@@ -4,8 +4,5 @@
 build/
 node_modules/
 data/
-<<<<<<< HEAD
 .env*
 *.md
-=======
->>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e

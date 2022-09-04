@@ -87,10 +87,6 @@ lcov.info
 pids
 logs
 results
-<<<<<<< HEAD
-=======
-node_modules
->>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 .node_history
 
 ############################
@@ -104,11 +100,7 @@ coverage
 # Strapi
 ############################
 
-<<<<<<< HEAD
 .env*
-=======
-.env
->>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 license.txt
 exports
 *.cache
