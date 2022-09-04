@@ -1,4 +1,5 @@
 var fs = require('fs');
+<<<<<<< HEAD
 
 const { request } = require('@octokit/request');
 const { createAppAuth } = require('@octokit/auth-app');
@@ -15,6 +16,14 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const PM2_CMD =
   'pm2 startOrRestart ecosystem.config.js && until [ "$(curl -X HEAD -o /dev/null -s -w "%{http_code}\n" http://localhost:1338/_health)" = 204 ]; do sleep 1; done';
+=======
+const express = require('express');
+const app = express();
+
+const exec = require('child_process').exec;
+const PM2_CMD =
+  'cd /opt/app/syncServer && pm2 startOrRestart ecosystem.config.js';
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 
 const { S3 } = require('@aws-sdk/client-s3');
 const { TransferMonitor } = require('s3-sync-client');
@@ -41,10 +50,14 @@ const ig = ignore().add(
     .filter((line) => line.length > 0 && line[0] !== '#'),
 );
 
+<<<<<<< HEAD
 app.get('/manager-control/:id', async (req, res) => {
   if (undefined === req.params.id) {
     res.status(400).json({ text: 'fail' });
   }
+=======
+app.get('/:id', async (req, res) => {
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
   await sync(
     `s3://${process.env.STRAPI_S3_BUCKET}/${req.params.id}`,
     '/opt/app',
@@ -52,6 +65,7 @@ app.get('/manager-control/:id', async (req, res) => {
       monitor,
       del: true,
       relocations: [[`${req.params.id}`, '']],
+<<<<<<< HEAD
       filters: [
         {
           exclude: (key) => {
@@ -110,6 +124,19 @@ app.get('/manager-control/:id', async (req, res) => {
 });
 
 app.get('/health', async (req, res) => {
+=======
+      filters: [{ exclude: (key) => ig.ignores(key) }],
+    },
+  );
+  exec(`cd /opt/app && ${PM2_CMD}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.send('fail');
+    }
+    console.log(`stdout: ${stdout}`);
+    console.log(`stderr: ${stderr}`);
+  });
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
   res.send('success');
 });
 

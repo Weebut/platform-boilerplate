@@ -3,7 +3,11 @@ name: Lightsail CMS Deploy
 on:
   push:
     branches:
+<<<<<<< HEAD
       - bug/cms
+=======
+      - feature/cms
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - main
     paths:
       - '.github/workflows/strapi.yaml'
@@ -11,9 +15,12 @@ on:
       - '!strapi/docker-compose.dev.yaml'
       - '!strapi/Dockerfile.dev'
       - '!strapi/README.md'
+<<<<<<< HEAD
       - '!.eslint**'
     tags-ignore:
       - v1.0_admin_*
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 
 jobs:
   deploy-ready:
@@ -38,7 +45,11 @@ jobs:
         id: stage
         shell: bash
         run: |
+<<<<<<< HEAD
           if [ "${{steps.extract_branch.outputs.branch}}" == "bug/cms" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
+=======
+          if [ "${{steps.extract_branch.outputs.branch}}" == "feature/cms" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - name: filter services
         uses: dorny/paths-filter@v2
         id: filter
@@ -118,8 +129,11 @@ jobs:
     needs: deploy-ready
     environment: ${{needs.deploy-ready.outputs.stage}}
     if: ${{ (needs.deploy-ready.outputs.strapi-superadmin == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+<<<<<<< HEAD
     outputs:
       time: ${{steps.time.outputs.time}}
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
@@ -129,6 +143,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+<<<<<<< HEAD
       - name: Get Time
         if: ${{ success() }}
         id: time
@@ -136,6 +151,8 @@ jobs:
         with:
           timeZone: 9
           format: 'YYYY-MM-DD-HH-mm-ss'
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - name: Create dotenv .env
         shell: bash
         working-directory: ./strapi
@@ -162,6 +179,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
           REPO: ${{github.REPOSITORY}}
+<<<<<<< HEAD
           BRANCH: ${{needs.deploy-ready.outputs.branch}}
           GH_APP_ID: ${{secrets.GH_APP_ID}}
           GH_APP_SECRET_KEY: ${{secrets.GH_APP_SECRET_KEY}}
@@ -169,6 +187,8 @@ jobs:
           GH_APP_CLIENT_SECRET: ${{secrets.GH_APP_CLIENT_SECRET}}
           GH_APP_INSTALLATION_ID: ${{secrets.GH_APP_INSTALLATION_ID}}
           GH_STRAPI_WORKFLOW_ID: ${{secrets.GH_STRAPI_WORKFLOW_ID}}
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
         run: |
           echo "DATABASE_HOST=$DATABASE_HOST" >> .env
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
@@ -187,6 +207,10 @@ jobs:
           echo "ECR_STRAPI_NGINX_REPOSITORY=$ECR_STRAPI_NGINX_REPOSITORY" >> .env
           echo "ECR_STRAPI_ADMIN_REPOSITORY=$ECR_STRAPI_ADMIN_REPOSITORY" >> .env
           echo "ECR_STRAPI_APP_REPOSITORY=$ECR_STRAPI_APP_REPOSITORY" >> .env
+<<<<<<< HEAD
+=======
+          echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> .env
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
           echo "ENV=$ENV" >> .env
           cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
           environment = "${{needs.deploy-ready.outputs.stage}}"
@@ -196,7 +220,11 @@ jobs:
               containers = [
                 {
                   name = "strapi-superadmin"
+<<<<<<< HEAD
                   image = "$ECR_REGISTRY/$ECR_STRAPI_ADMIN_REPOSITORY:$NODE_VERSION-$ENV-${{steps.time.outputs.time}}"
+=======
+                  image = "$ECR_REGISTRY/$ECR_STRAPI_ADMIN_REPOSITORY:$NODE_VERSION-$ENV-latest"
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
                   command = []
                   environment = {
                     APP_KEYS = "$APP_KEYS"
@@ -211,6 +239,7 @@ jobs:
                     STRAPI_S3_BUCKET = "$STRAPI_S3_BUCKET"
                     ENV = "$ENV"
                     REPO = "$REPO"
+<<<<<<< HEAD
                     BRANCH = "$BRANCH"
                     DATABASE_HOST = "$DATABASE_HOST"
                     GH_APP_ID = "$GH_APP_ID"
@@ -220,6 +249,10 @@ jobs:
                     GH_APP_INSTALLATION_ID = "$GH_APP_INSTALLATION_ID"
                     GH_STRAPI_WORKFLOW_ID = "$GH_STRAPI_WORKFLOW_ID"
                     DOMAIN = "https://$STRAPI_SUPERADMIN_DOMAIN"
+=======
+                    DATABASE_HOST = "$DATABASE_HOST"
+                    GITHUB_TOKEN = "$GITHUB_TOKEN"
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
                   }
                   ports = {
                     "1337" = "HTTP"
@@ -237,7 +270,11 @@ jobs:
                 },
                 {
                   name = "nginx"
+<<<<<<< HEAD
                   image = "$ECR_REGISTRY/$ECR_STRAPI_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-${{steps.time.outputs.time}}"
+=======
+                  image = "$ECR_REGISTRY/$ECR_STRAPI_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
                   command = []
                   environment = {
                     STRAPI_MANAGER_HOST = "localhost"
@@ -263,7 +300,11 @@ jobs:
                 },
                 {
                   name = "strapi-manager"
+<<<<<<< HEAD
                   image = "$ECR_REGISTRY/$ECR_STRAPI_APP_REPOSITORY:$NODE_VERSION-$ENV-${{steps.time.outputs.time}}"
+=======
+                  image = "$ECR_REGISTRY/$ECR_STRAPI_APP_REPOSITORY:$NODE_VERSION-$ENV-latest"
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
                   command = []
                   environment = {
                     APP_KEYS = "$APP_KEYS"
@@ -279,6 +320,7 @@ jobs:
                     PORT = 1338
                     ENV = "$ENV"
                     REPO = "$REPO"
+<<<<<<< HEAD
                     BRANCH = "$BRANCH"
                     DATABASE_HOST = "$DATABASE_HOST"
                     GH_APP_ID = "$GH_APP_ID"
@@ -288,6 +330,10 @@ jobs:
                     GH_APP_INSTALLATION_ID = "$GH_APP_INSTALLATION_ID"
                     GH_STRAPI_WORKFLOW_ID = "$GH_STRAPI_WORKFLOW_ID"
                     DOMAIN = "https://$STRAPI_MANAGER_DOMAIN"
+=======
+                    DATABASE_HOST = "$DATABASE_HOST"
+                    GITHUB_TOKEN = "$GITHUB_TOKEN"
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
                   }
                   ports = {
                     "1338" = "HTTP"
@@ -338,6 +384,16 @@ jobs:
       - name: Set up QEMU
         if: ${{ success() }}
         uses: docker/setup-qemu-action@v2
+<<<<<<< HEAD
+=======
+      - name: Get Time
+        if: ${{ success() }}
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 9
+          format: 'YYYY-MM-DD-HH-mm-ss'
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - name: Set up Docker Buildx
         if: ${{ success() }}
         uses: docker/setup-buildx-action@v2
@@ -364,11 +420,19 @@ jobs:
       - name: Build the stack
         if: ${{ success() }}
         working-directory: ./strapi
+<<<<<<< HEAD
         run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose build
       - name: Push the stack
         if: ${{ success() }}
         working-directory: ./strapi
         run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose push
+=======
+        run: TAG=${{steps.time.outputs.time}} docker compose build
+      - name: Push the stack
+        if: ${{ success() }}
+        working-directory: ./strapi
+        run: TAG=${{steps.time.outputs.time}} docker compose push ${{needs.deploy-ready.outputs.services}}
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - name: Build the stack latest
         if: ${{ success() }}
         working-directory: ./strapi
@@ -376,7 +440,11 @@ jobs:
       - name: Push the stack latest
         if: ${{ success() }}
         working-directory: ./strapi
+<<<<<<< HEAD
         run: docker compose push
+=======
+        run: docker compose push ${{needs.deploy-ready.outputs.services}}
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 
   deploy-service:
     name: service deployment

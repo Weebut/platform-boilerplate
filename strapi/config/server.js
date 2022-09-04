@@ -4,5 +4,8 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
+<<<<<<< HEAD
   url: env('DOMAIN'),
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 });

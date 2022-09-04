@@ -39,6 +39,7 @@ resource "aws_s3_bucket_acl" "b" {
   bucket = aws_s3_bucket.b.id
   acl    = "private"
 }
+<<<<<<< HEAD
 
 resource "aws_s3_bucket" "c" {
   bucket = "${var.environment}-init-strapi-upload-bucket"
@@ -50,3 +51,5 @@ resource "aws_s3_bucket_acl" "c" {
   bucket = aws_s3_bucket.c.id
   acl    = "private"
 }
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e

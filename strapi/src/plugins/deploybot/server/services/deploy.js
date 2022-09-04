@@ -1,6 +1,7 @@
 'use strict';
 var fs = require('fs');
 
+<<<<<<< HEAD
 const { request } = require('@octokit/request');
 const { createAppAuth } = require('@octokit/auth-app');
 const auth = createAppAuth({
@@ -8,6 +9,10 @@ const auth = createAppAuth({
   privateKey: process.env.GH_APP_SECRET_KEY.replaceAll('\\n', '\n'),
   installationId: process.env.GH_APP_INSTALLATION_ID,
 });
+=======
+const { Octokit } = require('@octokit/core');
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
 
 // s3 client and sync initialization
 const { S3 } = require('@aws-sdk/client-s3');
@@ -74,6 +79,7 @@ module.exports = ({ strapi }) => ({
         monitor,
       },
     );
+<<<<<<< HEAD
     const requestWithAuth = request.defaults({
       request: {
         hook: auth.hook,
@@ -84,14 +90,23 @@ module.exports = ({ strapi }) => ({
     });
     const { data: app } = await requestWithAuth('GET /app');
     const response = await requestWithAuth(
+=======
+    const response = await octokit.request(
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
       {
         owner: process.env.REPO.split('/')[0],
         repo: process.env.REPO.split('/')[1],
+<<<<<<< HEAD
         workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
         ref: process.env.BRANCH,
         inputs: {
           tag: deployment.id.toString(),
+=======
+        workflow_id: 'strapi_console',
+        client_payload: {
+          tag: deployment.id,
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
           environment: process.env.ENV,
         },
       },
@@ -181,16 +196,26 @@ module.exports = ({ strapi }) => ({
       },
     );
 
+<<<<<<< HEAD
     const { data: app } = await requestWithAuth('GET /app');
     const response = await requestWithAuth(
+=======
+    const response = await octokit.request(
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
       {
         owner: process.env.REPO.split('/')[0],
         repo: process.env.REPO.split('/')[1],
+<<<<<<< HEAD
         workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
         ref: process.env.BRANCH,
         inputs: {
           tag: deployment.id.toString(),
+=======
+        workflow_id: 'strapi_console',
+        client_payload: {
+          tag: deployment.id,
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
           environment: process.env.ENV,
         },
       },

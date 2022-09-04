@@ -47,12 +47,19 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: development
+<<<<<<< HEAD
       DOMAIN: http://localhost:8080
+=======
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
     volumes:
       - ./config:/opt/app/config
       - ./src:/opt/app/src
       - ./package.json:/opt/package.json
       - ./package-lock.json:/opt/package-lock.json
+<<<<<<< HEAD
+=======
+      - ./.env.development:/opt/app/.env
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - ./.gitignore:/opt/app/.gitignore
     ports:
       - 1337:1337
@@ -77,9 +84,14 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
+<<<<<<< HEAD
       DOMAIN: http://localhost:8081
     ports:
       - 1338:1338
+=======
+    ports:
+      - 1338:1337
+>>>>>>> 54ebda8a7d2ee9bd03ecc5ebcde16994e2612d7e
       - 1339:1339
     networks:
       - strapinetwork
