@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send GitHub Action trigger data to Slack workflow
-        id: slack-end
+        id: slack-send-1
         uses: slackapi/slack-github-action@v1.21.0
         if: ${{ inputs.status == 'succeeded'}}
         with:
@@ -48,7 +48,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
       - name: Send GitHub Action trigger data to Slack workflow
-        id: slack-end
+        id: slack-send-2
         uses: slackapi/slack-github-action@v1.21.0
         if: ${{ inputs.status == 'failed'}}
         with:
