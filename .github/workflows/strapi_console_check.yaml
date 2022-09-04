@@ -17,6 +17,25 @@ on:
         type: string
 
 jobs:
+  update-status:
+    name: update deployment status
+    runs-on: ubuntu-latest
+    environment: ${{inputs.environment}}
+    steps:
+      - name: mark this deployment as 'failure'
+        if: ${{ inputs.status == 'failed'}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
+          timeout: 10000
+      - name: mark this deployment as 'success'
+        if: ${{ inputs.status == 'succeeded'}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
+          method: 'PUT'
+          timeout: 10000
   slack-notify:
     name: notify to slack channel
     runs-on: ubuntu-latest
@@ -73,17 +92,3 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-      - name: mark this deployment as 'failure'
-        if: ${{ inputs.status == 'failed'}}
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
-          method: 'PUT'
-          timeout: 10000
-      - name: mark this deployment as 'success'
-        if: ${{ inputs.status == 'succeeded'}}
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
-          method: 'PUT'
-          timeout: 10000
