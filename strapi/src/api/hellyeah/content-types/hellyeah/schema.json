@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "hellyeahs",
+  "info": {
+    "singularName": "hellyeah",
+    "pluralName": "hellyeahs",
+    "displayName": "hellyeah"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "number": {
+      "type": "integer"
+    },
+    "password": {
+      "type": "password"
+    }
+  }
+}
