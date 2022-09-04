@@ -60,7 +60,7 @@ app.get('/manager-control/:id', async (req, res) => {
       ],
     },
   );
-  exec(`cd /opt/app && ${PM2_CMD}`, (error, stdout, stderr) => {
+  exec(`cd /opt/app && npm install && ${PM2_CMD}`, (error, stdout, stderr) => {
     if (error || stderr) {
       console.error(`exec error: ${error}`);
       res.status(400).json({ text: 'fail' });

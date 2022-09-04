@@ -70,14 +70,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-      - name: pull files from s3
+      - name: emove unused files
         if: success()
         shell: bash
         working-directory: .
         run: |
           rm -rf aws
           rm -rf awscliv2.zip
-      - name: remove unused files
+      - name: pull files from s3
         if: success()
         shell: bash
         working-directory: ./strapi
