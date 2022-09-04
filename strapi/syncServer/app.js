@@ -2,7 +2,8 @@ var fs = require('fs');
 const express = require('express');
 const app = express();
 
-const exec = require('child_process').exec;
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const PM2_CMD =
   'pm2 startOrRestart ecosystem.config.js && until [ "$(curl -X HEAD -o /dev/null -s -w "%{http_code}\n" http://localhost:1338/_health)" = 204 ]; do sleep 1; done';
 
@@ -60,14 +61,15 @@ app.get('/manager-control/:id', async (req, res) => {
       ],
     },
   );
-  exec(`cd /opt/app && npm install && ${PM2_CMD}`, (error, stdout, stderr) => {
-    if (error || stderr) {
-      console.error(`exec error: ${error}`);
-      res.status(400).json({ text: 'fail' });
-    }
-    console.log(`stdout: ${stdout}`);
-    console.log(`stderr: ${stderr}`);
-  });
+  const { stdout, stderr } = await exec(
+    `cd /opt/app && npm install && ${PM2_CMD}`,
+  );
+
+  if (stderr) {
+    console.error(`exec error: ${error}`);
+    res.status(400).json({ text: 'fail' });
+  }
+  console.log(`stdout: ${stdout}`);
   res.send('success');
 });
 
