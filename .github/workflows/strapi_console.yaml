@@ -24,7 +24,7 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "콘솔에 의한 CMS 변경이 감지되었습니다",
+              "text": "콘솔에 의한 CMS 변경이 감지되었습니다 (deployment #${{inputs.tag}})",
               "attachments": [
                 {
                   "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
@@ -115,43 +115,10 @@ jobs:
           url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/manager-control/${{inputs.tag}}'
           method: 'GET'
           timeout: 300000
-      - name: Send GitHub Action trigger data to Slack workflow
-        id: slack-end
-        uses: slackapi/slack-github-action@v1.21.0
-        if: success()
-        with:
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "콘솔에 의한 CMS 변경이 적용되었습니다",
-              "attachments": [
-                {
-                  "color": "#8fce00",
-                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "End"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
       - name: mark this deployment as 'failure'
         if: failure()
         uses: fjogeleit/http-request-action@v1
         with:
           url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
-          method: 'PUT'
-          timeout: 10000
-      - name: mark this deployment as 'success'
-        if: success()
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
           method: 'PUT'
           timeout: 10000

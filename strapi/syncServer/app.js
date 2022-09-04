@@ -1,4 +1,13 @@
 var fs = require('fs');
+
+const { request } = require('@octokit/request');
+const { createAppAuth } = require('@octokit/auth-app');
+const auth = createAppAuth({
+  appId: process.env.GH_APP_ID,
+  privateKey: process.env.GH_APP_SECRET_KEY.replaceAll('\\n', '\n'),
+  installationId: process.env.GH_APP_INSTALLATION_ID,
+});
+
 const express = require('express');
 const app = express();
 
@@ -61,16 +70,43 @@ app.get('/manager-control/:id', async (req, res) => {
       ],
     },
   );
+  res.send('success');
+
   const { stdout, stderr } = await exec(
-    `cd /opt/app && npm install && cd src && find . -type d -empty -delete && cd /opt/app && ${PM2_CMD}`,
+    `cd /opt/app && npm install && cd src && find . -type d -empty -delete && cd /opt/app &&${PM2_CMD}`,
   );
+
+  var status = 'succeeded';
 
   if (stderr) {
     console.error(`exec error: ${error}`);
-    res.status(400).json({ text: 'fail' });
+    status = 'failed';
   }
   console.log(`stdout: ${stdout}`);
-  res.send('success');
+
+  const requestWithAuth = request.defaults({
+    request: {
+      hook: auth.hook,
+    },
+    mediaType: {
+      previews: ['machine-man'],
+    },
+  });
+  const { data: app } = await requestWithAuth('GET /app');
+  const response = await requestWithAuth(
+    'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+    {
+      owner: process.env.REPO.split('/')[0],
+      repo: process.env.REPO.split('/')[1],
+      workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
+      ref: process.env.BRANCH,
+      inputs: {
+        tag: `${req.params.id}`,
+        environment: process.env.ENV,
+        status,
+      },
+    },
+  );
 });
 
 app.get('/health', async (req, res) => {
