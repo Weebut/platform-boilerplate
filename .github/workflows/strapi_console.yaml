@@ -24,7 +24,7 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "콘솔에 의한 CMS 변경이 감지되었습니다",
+              "text": "콘솔에 의한 CMS 변경이 감지되었습니다 (deployment #${{inputs.tag}})",
               "attachments": [
                 {
                   "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
@@ -45,10 +45,17 @@ jobs:
     name: detect change occurred from console and apply to repository
     runs-on: ubuntu-latest
     environment: ${{inputs.environment}}
+    needs: slack-notify
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: feature/cms
+          ref: ${{ github.ref }}
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 9
+          format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Install AWS CLI 2
         if: success()
         run: |
@@ -63,17 +70,28 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+      - name: emove unused files
+        if: success()
+        shell: bash
+        working-directory: .
+        run: |
+          rm -rf aws
+          rm -rf awscliv2.zip
       - name: pull files from s3
         if: success()
         shell: bash
         working-directory: ./strapi
         run: |
-          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${inputs.tag} .
+          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${{inputs.tag}} . --delete
       - name: add and push
         if: success()
         shell: bash
         run: |
+          git config --global user.name 'strapiAdmin'
+          git config --global user.email 'dev@weebut.com'
           git add -A
+          git commit -am "(strapi_console) deployment #${{inputs.tag}}: triggered at ${{steps.time.outputs.time}}"
+          git tag v1.0_admin_${{steps.time.outputs.time}}
           git push
       - name: mark this deployment as 'failure'
         if: failure()
@@ -90,46 +108,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: feature/cms
+          ref: ${{ github.ref }}
       - name: request update of manager CMS
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/restart/${{inputs.tag}}'
-          method: 'POST'
-      - name: Send GitHub Action trigger data to Slack workflow
-        id: slack-end
-        uses: slackapi/slack-github-action@v1.21.0
-        if: success()
-        with:
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "콘솔에 의한 CMS 변경이 적용되었습니다",
-              "attachments": [
-                {
-                  "color": "#8fce00",
-                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "short": true,
-                      "value": "End"
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/manager-control/${{inputs.tag}}'
+          method: 'GET'
+          timeout: 300000
       - name: mark this deployment as 'failure'
         if: failure()
         uses: fjogeleit/http-request-action@v1
         with:
           url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
           method: 'PUT'
-      - name: mark this deployment as 'success'
-        if: success()
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
+          timeout: 10000

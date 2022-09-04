@@ -47,12 +47,12 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: development
+      DOMAIN: http://localhost:8080
     volumes:
       - ./config:/opt/app/config
       - ./src:/opt/app/src
       - ./package.json:/opt/package.json
       - ./package-lock.json:/opt/package-lock.json
-      - ./.env.development:/opt/app/.env
       - ./.gitignore:/opt/app/.gitignore
     ports:
       - 1337:1337
@@ -77,8 +77,9 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
+      DOMAIN: http://localhost:8081
     ports:
-      - 1338:1337
+      - 1338:1338
       - 1339:1339
     networks:
       - strapinetwork

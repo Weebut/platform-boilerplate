@@ -3,7 +3,7 @@ name: Lightsail CMS Deploy
 on:
   push:
     branches:
-      - feature/cms
+      - bug/cms
       - main
     paths:
       - '.github/workflows/strapi.yaml'
@@ -11,6 +11,9 @@ on:
       - '!strapi/docker-compose.dev.yaml'
       - '!strapi/Dockerfile.dev'
       - '!strapi/README.md'
+      - '!.eslint**'
+    tags-ignore:
+      - v1.0_admin_*
 
 jobs:
   deploy-ready:
@@ -35,7 +38,7 @@ jobs:
         id: stage
         shell: bash
         run: |
-          if [ "${{steps.extract_branch.outputs.branch}}" == "feature/cms" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
+          if [ "${{steps.extract_branch.outputs.branch}}" == "bug/cms" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
       - name: filter services
         uses: dorny/paths-filter@v2
         id: filter
@@ -115,6 +118,8 @@ jobs:
     needs: deploy-ready
     environment: ${{needs.deploy-ready.outputs.stage}}
     if: ${{ (needs.deploy-ready.outputs.strapi-superadmin == 'true')|| (needs.deploy-ready.outputs.nginx == 'true') }}
+    outputs:
+      time: ${{steps.time.outputs.time}}
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
@@ -124,6 +129,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+      - name: Get Time
+        if: ${{ success() }}
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 9
+          format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Create dotenv .env
         shell: bash
         working-directory: ./strapi
@@ -150,6 +162,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           ENV: ${{needs.deploy-ready.outputs.stage}}
           REPO: ${{github.REPOSITORY}}
+          BRANCH: ${{needs.deploy-ready.outputs.branch}}
+          GH_APP_ID: ${{secrets.GH_APP_ID}}
+          GH_APP_SECRET_KEY: ${{secrets.GH_APP_SECRET_KEY}}
+          GH_APP_CLIENT_ID: ${{secrets.GH_APP_CLIENT_ID}}
+          GH_APP_CLIENT_SECRET: ${{secrets.GH_APP_CLIENT_SECRET}}
+          GH_APP_INSTALLATION_ID: ${{secrets.GH_APP_INSTALLATION_ID}}
+          GH_STRAPI_WORKFLOW_ID: ${{secrets.GH_STRAPI_WORKFLOW_ID}}
         run: |
           echo "DATABASE_HOST=$DATABASE_HOST" >> .env
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
@@ -168,7 +187,6 @@ jobs:
           echo "ECR_STRAPI_NGINX_REPOSITORY=$ECR_STRAPI_NGINX_REPOSITORY" >> .env
           echo "ECR_STRAPI_ADMIN_REPOSITORY=$ECR_STRAPI_ADMIN_REPOSITORY" >> .env
           echo "ECR_STRAPI_APP_REPOSITORY=$ECR_STRAPI_APP_REPOSITORY" >> .env
-          echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> .env
           echo "ENV=$ENV" >> .env
           cat > ../terraform/vars/${{needs.deploy-ready.outputs.stage}}.tfvars <<EOL
           environment = "${{needs.deploy-ready.outputs.stage}}"
@@ -178,7 +196,7 @@ jobs:
               containers = [
                 {
                   name = "strapi-superadmin"
-                  image = "$ECR_REGISTRY/$ECR_STRAPI_ADMIN_REPOSITORY:$NODE_VERSION-$ENV-latest"
+                  image = "$ECR_REGISTRY/$ECR_STRAPI_ADMIN_REPOSITORY:$NODE_VERSION-$ENV-${{steps.time.outputs.time}}"
                   command = []
                   environment = {
                     APP_KEYS = "$APP_KEYS"
@@ -193,8 +211,15 @@ jobs:
                     STRAPI_S3_BUCKET = "$STRAPI_S3_BUCKET"
                     ENV = "$ENV"
                     REPO = "$REPO"
+                    BRANCH = "$BRANCH"
                     DATABASE_HOST = "$DATABASE_HOST"
-                    GITHUB_TOKEN = "$GITHUB_TOKEN"
+                    GH_APP_ID = "$GH_APP_ID"
+                    GH_APP_SECRET_KEY = "$GH_APP_SECRET_KEY"
+                    GH_APP_CLIENT_ID = "$GH_APP_CLIENT_ID"
+                    GH_APP_CLIENT_SECRET = "$GH_APP_CLIENT_SECRET"
+                    GH_APP_INSTALLATION_ID = "$GH_APP_INSTALLATION_ID"
+                    GH_STRAPI_WORKFLOW_ID = "$GH_STRAPI_WORKFLOW_ID"
+                    DOMAIN = "https://$STRAPI_SUPERADMIN_DOMAIN"
                   }
                   ports = {
                     "1337" = "HTTP"
@@ -212,7 +237,7 @@ jobs:
                 },
                 {
                   name = "nginx"
-                  image = "$ECR_REGISTRY/$ECR_STRAPI_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-latest"
+                  image = "$ECR_REGISTRY/$ECR_STRAPI_NGINX_REPOSITORY:$NGINX_VERSION-$ENV-${{steps.time.outputs.time}}"
                   command = []
                   environment = {
                     STRAPI_MANAGER_HOST = "localhost"
@@ -238,7 +263,7 @@ jobs:
                 },
                 {
                   name = "strapi-manager"
-                  image = "$ECR_REGISTRY/$ECR_STRAPI_APP_REPOSITORY:$NODE_VERSION-$ENV-latest"
+                  image = "$ECR_REGISTRY/$ECR_STRAPI_APP_REPOSITORY:$NODE_VERSION-$ENV-${{steps.time.outputs.time}}"
                   command = []
                   environment = {
                     APP_KEYS = "$APP_KEYS"
@@ -254,8 +279,15 @@ jobs:
                     PORT = 1338
                     ENV = "$ENV"
                     REPO = "$REPO"
+                    BRANCH = "$BRANCH"
                     DATABASE_HOST = "$DATABASE_HOST"
-                    GITHUB_TOKEN = "$GITHUB_TOKEN"
+                    GH_APP_ID = "$GH_APP_ID"
+                    GH_APP_SECRET_KEY = "$GH_APP_SECRET_KEY"
+                    GH_APP_CLIENT_ID = "$GH_APP_CLIENT_ID"
+                    GH_APP_CLIENT_SECRET = "$GH_APP_CLIENT_SECRET"
+                    GH_APP_INSTALLATION_ID = "$GH_APP_INSTALLATION_ID"
+                    GH_STRAPI_WORKFLOW_ID = "$GH_STRAPI_WORKFLOW_ID"
+                    DOMAIN = "https://$STRAPI_MANAGER_DOMAIN"
                   }
                   ports = {
                     "1338" = "HTTP"
@@ -306,13 +338,6 @@ jobs:
       - name: Set up QEMU
         if: ${{ success() }}
         uses: docker/setup-qemu-action@v2
-      - name: Get Time
-        if: ${{ success() }}
-        id: time
-        uses: nanzm/get-time-action@v1.1
-        with:
-          timeZone: 9
-          format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Set up Docker Buildx
         if: ${{ success() }}
         uses: docker/setup-buildx-action@v2
@@ -339,11 +364,11 @@ jobs:
       - name: Build the stack
         if: ${{ success() }}
         working-directory: ./strapi
-        run: TAG=${{steps.time.outputs.time}} docker compose build
+        run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose build
       - name: Push the stack
         if: ${{ success() }}
         working-directory: ./strapi
-        run: TAG=${{steps.time.outputs.time}} docker compose push ${{needs.deploy-ready.outputs.services}}
+        run: TAG=${{needs.prepare-dotenv.outputs.time}} docker compose push
       - name: Build the stack latest
         if: ${{ success() }}
         working-directory: ./strapi
@@ -351,7 +376,7 @@ jobs:
       - name: Push the stack latest
         if: ${{ success() }}
         working-directory: ./strapi
-        run: docker compose push ${{needs.deploy-ready.outputs.services}}
+        run: docker compose push
 
   deploy-service:
     name: service deployment

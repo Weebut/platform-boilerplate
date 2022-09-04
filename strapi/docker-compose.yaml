@@ -36,6 +36,8 @@ services:
     image: ${ECR_REGISTRY}/${ECR_STRAPI_ADMIN_REPOSITORY}:${NODE_VERSION:-16.14.2}-${ENV:-dev}-${TAG:-latest}
     restart: unless-stopped
     env_file: .env
+    environment:
+      - DOMAIN=http://localhost:8080
     ports:
       - 1337:1337
     networks:
@@ -50,8 +52,11 @@ services:
     image: ${ECR_REGISTRY}/${ECR_STRAPI_APP_REPOSITORY}:${NODE_VERSION:-16.14.2}-${ENV:-dev}-${TAG:-latest}
     restart: unless-stopped
     env_file: .env
+    environment:
+      - PORT=1338
+      - DOMAIN=http://localhost:8081
     ports:
-      - 1338:1337
-      - 1339:1338
+      - 1338:1338
+      - 1339:1339
     networks:
       - strapinetwork

@@ -1,0 +1,89 @@
+name: strapi_console_check
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'S3 scenario tag (deployment id)'
+        required: true
+        type: number
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        type: string
+      status:
+        description: 'status for previous workflow'
+        required: true
+        type: string
+
+jobs:
+  slack-notify:
+    name: notify to slack channel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack-end
+        uses: slackapi/slack-github-action@v1.21.0
+        if: ${{ inputs.status == 'succeeded'}}
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "콘솔에 의한 CMS 변경이 적용되었습니다 (deployment #${{inputs.tag}})",
+              "attachments": [
+                {
+                  "color": "#8fce00",
+                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "End"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack-end
+        uses: slackapi/slack-github-action@v1.21.0
+        if: ${{ inputs.status == 'failed'}}
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "콘솔에 의한 CMS 변경이 실패했습니다 (deployment #${{inputs.tag}})",
+              "attachments": [
+                {
+                  "color": "#ff5733",
+                  "pretext": "Deployment of <${{github.SERVER_URL}}/${{github.REPOSITORY}}/actions/runs/${{github.RUN_ID}}|${{inputs.environment}}> stage started by <https://github.com/${{github.ACTOR}}|${{github.ACTOR}}>",
+                  "fields": [
+                    {
+                      "title": "Status",
+                      "short": true,
+                      "value": "End"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: mark this deployment as 'failure'
+        if: ${{ inputs.status == 'failed'}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
+          timeout: 10000
+      - name: mark this deployment as 'success'
+        if: ${{ inputs.status == 'succeeded'}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
+          method: 'PUT'
+          timeout: 10000
