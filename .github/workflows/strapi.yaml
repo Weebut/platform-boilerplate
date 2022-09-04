@@ -11,7 +11,7 @@ on:
       - '!strapi/docker-compose.dev.yaml'
       - '!strapi/Dockerfile.dev'
       - '!strapi/README.md'
-      - '!.eslint**'
+      - '!strapi/.eslint**'
     tags-ignore:
       - v1.0_admin_*
 
