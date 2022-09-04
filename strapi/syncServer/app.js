@@ -62,7 +62,7 @@ app.get('/manager-control/:id', async (req, res) => {
     },
   );
   const { stdout, stderr } = await exec(
-    `cd /opt/app && npm install && ${PM2_CMD}`,
+    `cd /opt/app && npm install && cd src && find . -type d -empty -delete && cd /opt/app && ${PM2_CMD}`,
   );
 
   if (stderr) {

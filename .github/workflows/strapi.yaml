@@ -376,7 +376,7 @@ jobs:
       - name: Push the stack latest
         if: ${{ success() }}
         working-directory: ./strapi
-        run: docker compose push ${{needs.deploy-ready.outputs.services}}
+        run: docker compose push
 
   deploy-service:
     name: service deployment
