@@ -220,6 +220,7 @@ jobs:
                     GH_APP_CLIENT_SECRET = "$GH_APP_CLIENT_SECRET"
                     GH_APP_INSTALLATION_ID = "$GH_APP_INSTALLATION_ID"
                     GH_STRAPI_WORKFLOW_ID = "$GH_STRAPI_WORKFLOW_ID"
+                    GH_STRAPI_CHECK_WORKFLOW_ID = "$GH_STRAPI_CHECK_WORKFLOW_ID"
                     DOMAIN = "https://$STRAPI_SUPERADMIN_DOMAIN"
                   }
                   ports = {
@@ -288,6 +289,7 @@ jobs:
                     GH_APP_CLIENT_SECRET = "$GH_APP_CLIENT_SECRET"
                     GH_APP_INSTALLATION_ID = "$GH_APP_INSTALLATION_ID"
                     GH_STRAPI_WORKFLOW_ID = "$GH_STRAPI_WORKFLOW_ID"
+                    GH_STRAPI_CHECK_WORKFLOW_ID = "$GH_STRAPI_CHECK_WORKFLOW_ID"
                     DOMAIN = "https://$STRAPI_MANAGER_DOMAIN"
                   }
                   ports = {
