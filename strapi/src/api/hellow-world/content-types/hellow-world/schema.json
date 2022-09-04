@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "hellow_worlds",
+  "info": {
+    "singularName": "hellow-world",
+    "pluralName": "hellow-worlds",
+    "displayName": "hellowWorld"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email"
+    },
+    "description": {
+      "type": "richtext"
+    }
+  }
+}
