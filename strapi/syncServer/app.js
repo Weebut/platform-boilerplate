@@ -98,7 +98,7 @@ app.get('/manager-control/:id', async (req, res) => {
     {
       owner: process.env.REPO.split('/')[0],
       repo: process.env.REPO.split('/')[1],
-      workflow_id: process.env.GH_STRAPI_WORKFLOW_ID,
+      workflow_id: process.env.GH_STRAPI_CHECK_WORKFLOW_ID,
       ref: process.env.BRANCH,
       inputs: {
         tag: `${req.params.id}`,
