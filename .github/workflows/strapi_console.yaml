@@ -82,7 +82,7 @@ jobs:
         shell: bash
         working-directory: ./strapi
         run: |
-          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${{inputs.tag}} .
+          aws s3 sync s3://${{secrets.STRAPI_S3_BUCKET}}/${{inputs.tag}} . --delete
       - name: add and push
         if: success()
         shell: bash
