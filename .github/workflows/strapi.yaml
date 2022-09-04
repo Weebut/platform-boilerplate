@@ -168,6 +168,7 @@ jobs:
           GH_APP_CLIENT_ID: ${{secrets.GH_APP_CLIENT_ID}}
           GH_APP_CLIENT_SECRET: ${{secrets.GH_APP_CLIENT_SECRET}}
           GH_APP_INSTALLATION_ID: ${{secrets.GH_APP_INSTALLATION_ID}}
+          GH_STRAPI_WORKFLOW_ID: ${{secrets.GH_STRAPI_WORKFLOW_ID}}
         run: |
           echo "DATABASE_HOST=$DATABASE_HOST" >> .env
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
