@@ -17,12 +17,32 @@ on:
         type: string
 
 jobs:
+  update-status:
+    name: update deployment status
+    runs-on: ubuntu-latest
+    environment: ${{inputs.environment}}
+    steps:
+      - name: mark this deployment as 'failure'
+        if: ${{ inputs.status == 'failed'}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
+          method: 'PUT'
+          timeout: 10000
+      - name: mark this deployment as 'success'
+        if: ${{ inputs.status == 'succeeded'}}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
+          method: 'PUT'
+          timeout: 10000
   slack-notify:
     name: notify to slack channel
     runs-on: ubuntu-latest
+    needs: update-status
     steps:
       - name: Send GitHub Action trigger data to Slack workflow
-        id: slack-end
+        id: slack-send-1
         uses: slackapi/slack-github-action@v1.21.0
         if: ${{ inputs.status == 'succeeded'}}
         with:
@@ -38,7 +58,7 @@ jobs:
                     {
                       "title": "Status",
                       "short": true,
-                      "value": "End"
+                      "value": "Success"
                     }
                   ]
                 }
@@ -48,7 +68,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
       - name: Send GitHub Action trigger data to Slack workflow
-        id: slack-end
+        id: slack-send-2
         uses: slackapi/slack-github-action@v1.21.0
         if: ${{ inputs.status == 'failed'}}
         with:
@@ -64,7 +84,7 @@ jobs:
                     {
                       "title": "Status",
                       "short": true,
-                      "value": "End"
+                      "value": "Failure"
                     }
                   ]
                 }
@@ -73,17 +93,3 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-      - name: mark this deployment as 'failure'
-        if: ${{ inputs.status == 'failed'}}
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/failed'
-          method: 'PUT'
-          timeout: 10000
-      - name: mark this deployment as 'success'
-        if: ${{ inputs.status == 'succeeded'}}
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://${{secrets.STRAPI_SUPERADMIN_DOMAIN}}/deploybot/${{inputs.tag}}/status/succeeded'
-          method: 'PUT'
-          timeout: 10000

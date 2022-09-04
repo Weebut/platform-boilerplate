@@ -3,7 +3,7 @@ name: Lightsail CMS Deploy
 on:
   push:
     branches:
-      - bug/cms
+      - develop
       - main
     paths:
       - '.github/workflows/strapi.yaml'
@@ -11,7 +11,7 @@ on:
       - '!strapi/docker-compose.dev.yaml'
       - '!strapi/Dockerfile.dev'
       - '!strapi/README.md'
-      - '!.eslint**'
+      - '!strapi/.eslint**'
     tags-ignore:
       - v1.0_admin_*
 
@@ -38,7 +38,7 @@ jobs:
         id: stage
         shell: bash
         run: |
-          if [ "${{steps.extract_branch.outputs.branch}}" == "bug/cms" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
+          if [ "${{steps.extract_branch.outputs.branch}}" == "develop" ]; then echo "::set-output name=stage::dev"; else echo "::set-output name=stage::production"; fi
       - name: filter services
         uses: dorny/paths-filter@v2
         id: filter
