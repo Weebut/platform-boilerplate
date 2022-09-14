@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 interface SideBarProps {
@@ -19,27 +19,52 @@ export function SideBar({ groups }: SideBarProps) {
   const [selected, setSelected] = useState<Group>(groups[0]);
 
   return (
-    <Box className="hidden h-full w-[300px] p-6 md:block">
+    <Stack
+      id="side-bar"
+      display={{ xs: 'none', md: 'block' }}
+      height="100%"
+      width="300px"
+      p={6}
+      spacing={3}
+    >
       {groups.map((group, idx) => (
-        <Box key={idx} className="my-1 flex flex-col">
-          <Box
+        <Box key={idx} flex="col" my={1}>
+          <Stack
             onClick={() => setSelected(group)}
-            className={
-              selected.name === group.name
-                ? `flex space-x-2 rounded-lg bg-white p-3 text-lg capitalize`
-                : `flex space-x-2 rounded-lg p-3 text-lg transition-colors hover:bg-white`
-            }
+            direction="row"
+            spacing={2}
+            borderRadius="10px"
+            p={3}
+            fontSize={16}
+            sx={{
+              transition: 'all 150ms ease-in-out',
+              backgroundColor:
+                selected.name === group.name ? 'white' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'white',
+              },
+            }}
           >
             <Typography>{group.icon}</Typography>
             <Typography> {group.name}</Typography>
-          </Box>
-          <Box className="flex flex-col pl-8">
-            <Box hidden={selected.name !== group.name} className="h-3" />
+          </Stack>
+          <Box flex="col" pl={8}>
+            <Box hidden={selected.name !== group.name} height={12} />
             {group.tabs.map((tab, idx) => (
               <Box
                 key={idx}
                 hidden={selected.name !== group.name}
-                className="py-1 text-left text-black text-opacity-70 transition duration-150 ease-in-out hover:translate-x-[3px] hover:text-opacity-100"
+                py={1}
+                textAlign="left"
+                color="black"
+                sx={{
+                  opacity: 0.7,
+                  transition: 'all 150ms ease-in-out',
+                  '&:hover': {
+                    transform: 'translateX(3px)',
+                    opacity: 1,
+                  },
+                }}
               >
                 {tab.name}
               </Box>
@@ -47,6 +72,6 @@ export function SideBar({ groups }: SideBarProps) {
           </Box>
         </Box>
       ))}
-    </Box>
+    </Stack>
   );
 }

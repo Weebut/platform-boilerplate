@@ -13,8 +13,10 @@ class MyDocument extends Document {
           <meta name="theme-color" content={theme.palette.primary.main} />
           <link rel="shortcut icon" href="/favicon.ico" />
           <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
             rel="stylesheet"
+            as="style"
+            crossOrigin=""
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.5/dist/web/static/pretendard-dynamic-subset.css"
           />
           <meta name={emotionInsertionPointName} content="" />
           {(this.props as any).emotionStyleTags}
@@ -22,7 +24,6 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
-          <div id="modal-root"></div>
         </body>
       </Html>
     );

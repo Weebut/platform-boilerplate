@@ -3,7 +3,6 @@ import { Layout } from '@components/layouts/layout.component';
 import { Strip } from '@components/strips/strip.component';
 import { useIntersectionObserver } from '@hooks/intersection-observer';
 import { useMoviesInfinite } from '@hooks/use-movies-infinte';
-import { useWarnBeforeClosing } from '@hooks/warn-before-closing';
 import { Box, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
@@ -25,8 +24,6 @@ export function MoviesContainer() {
     target: infiniteScrollTarget,
   });
 
-  useWarnBeforeClosing({ isClosable: false });
-
   function getMovies() {
     if (moviesResult) {
       const movies: any[] = [];
@@ -40,14 +37,21 @@ export function MoviesContainer() {
   }
 
   return (
-    <Layout showFooter={false}>
+    <Layout showFooter={false} pt={80} pb={80}>
       <Strip>
-        <Box className="py-32">
-          <Typography className="text-4xl font-bold">
+        <Box>
+          <Typography fontWeight="bold" variant="h4">
             Movies Now Playing
           </Typography>
           {/* Infinite scroll */}
-          <Box className="flex flex-wrap gap-4 py-12">
+          <Box
+            display="flex"
+            sx={{
+              flexWrap: 'wrap',
+              gap: 4,
+              py: 12,
+            }}
+          >
             {getMovies().map((movie, idx) => (
               <MovieCard
                 key={idx}
@@ -58,7 +62,7 @@ export function MoviesContainer() {
             ))}
             <Box
               id={infiniteScrollTarget}
-              className="h-32"
+              height={128}
               hidden={!moviesResult?.hasNext}
             />
           </Box>

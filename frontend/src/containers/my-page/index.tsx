@@ -1,6 +1,5 @@
 import { PostCard } from '@components/cards/post-card.component';
-import { SideBarLayout } from '@components/layouts/side-bar-layout.component';
-import { Group } from '@components/side-bars/side-bar.component';
+import { Layout } from '@components/layouts/layout.component';
 import { Strip } from '@components/strips/strip.component';
 import { useFirebaseUser } from '@hooks/firebase-user';
 import { Box, Stack, Typography } from '@mui/material';
@@ -34,60 +33,49 @@ export function MyPageContainer() {
     },
   ];
 
-  const groups: Group[] = [
-    {
-      icon: '🔥',
-      name: '인기 카테고리',
-      tabs: [
-        { name: '웹 개발' },
-        { name: 'React' },
-        { name: 'Python' },
-        { name: 'Android' },
-      ],
-    },
-    {
-      icon: '🧑‍💻',
-      name: '개발',
-      tabs: [
-        { name: '일반 개발' },
-        { name: 'Javascript' },
-        { name: 'React' },
-        { name: 'Vue.js' },
-      ],
-    },
-  ];
-
   const { user } = useFirebaseUser();
 
   return (
-    <SideBarLayout groups={groups}>
+    <Layout pt={40} pb={60}>
       <Strip>
-        <Box className="flex h-full w-full flex-col py-12">
-          <Box>
-            <Typography className="text-2xl">안녕하세요,</Typography>
-            <Typography className="text-2xl font-bold">
-              {user?.email} 님
+        <Box
+          display="flex"
+          height="100%"
+          width="100%"
+          flexDirection="column"
+          py={12}
+        >
+          <Box width="100%" display="flex" flexWrap="wrap">
+            <Typography variant="h5">안녕하세요,&nbsp;</Typography>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              whiteSpace={'nowrap'}
+            >
+              {user?.email.split('@')[0]} 님
             </Typography>
           </Box>
         </Box>
       </Strip>
       <Strip>
-        <Stack spacing={4} className="flex w-full flex-col">
-          <Stack spacing={2} className="flex flex-col">
-            <Typography className="text-xl font-bold">
+        <Stack spacing={4} display="flex" width="100%" flexDirection="column">
+          <Stack spacing={2} display="flex" flexDirection="column">
+            <Typography variant="h6" fontWeight="bold">
               대기 중인 포스트
             </Typography>
-            <Typography className="text-sm">
+            <Typography variant="h6">
               포스트 심사 결과는 매주 수요일 발표됩니다
             </Typography>
           </Stack>
-          <Box className="flex flex-wrap">
+          <Box display="flex" flexWrap="wrap" gap={6}>
             {cards.map((card, index) => (
               <PostCard key={index} card={card} />
             ))}
           </Box>
         </Stack>
       </Strip>
-    </SideBarLayout>
+    </Layout>
   );
 }

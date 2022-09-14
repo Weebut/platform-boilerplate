@@ -42,57 +42,74 @@ export function SignInContainer() {
   return (
     <Layout>
       <Strip>
-        <Stack spacing={4} className="flex w-full flex-col">
-          <Box className="flex justify-center py-12">
-            <Typography className="text-3xl font-bold">로그인</Typography>
+        <Stack spacing={4} flex="col" width="100%">
+          <Box display="flex" justifyContent="center" py={12}>
+            <Typography variant="h4" fontWeight="bold">
+              로그인
+            </Typography>
           </Box>
           <form
-            className="flex flex-col space-y-4"
             onSubmit={(event) => {
               event.preventDefault();
               handleSignIn();
             }}
           >
-            <TextField
-              label="이메일"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              required
-              disabled={isLoading}
-            />
-            <TextField
-              label="비밀번호"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              required
-              disabled={isLoading}
-            />
-            <Button
-              disabled={isLoading || !(email && password)}
-              fullWidth
-              variant="contained"
-              type="submit"
-            >
-              로그인
-            </Button>
+            <Stack direction="column" spacing={4}>
+              <TextField
+                label="이메일"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                required
+                disabled={isLoading}
+              />
+              <TextField
+                label="비밀번호"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                required
+                disabled={isLoading}
+              />
+              <Button
+                disabled={isLoading || !(email && password)}
+                fullWidth
+                variant="contained"
+                type="submit"
+              >
+                로그인
+              </Button>
+            </Stack>
           </form>
           <Button onClick={signInWithGoogle}>Sign in with Google</Button>
           <Button onClick={signInWithGithub}>Sign in with Github</Button>
-          <Box className="flex w-full items-center">
+          <Stack
+            width="100%"
+            display="flex"
+            alignItems="center"
+            direction="row"
+            spacing={2}
+          >
             <NextLink href="/reset-password" passHref>
-              <Link className="text-grey text-sm hover:underline">
+              <Link
+                sx={{
+                  color: 'gray',
+                }}
+              >
                 비밀번호가 기억나지 않나요?
               </Link>
             </NextLink>
-            <Box className="flex-auto" />
+            <Box flexGrow={1} />
             <NextLink href="/sign-up" passHref>
-              <Link className="text-grey text-sm hover:underline">
+              <Link
+                sx={{
+                  color: 'gray',
+                }}
+              >
                 계정이 없으신가요?
               </Link>
             </NextLink>
-          </Box>
+          </Stack>
         </Stack>
       </Strip>
     </Layout>

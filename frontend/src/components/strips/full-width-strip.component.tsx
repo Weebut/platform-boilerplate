@@ -4,15 +4,14 @@ import { Strip } from './strip.component';
 
 interface FullWidthStripProps {
   children: ReactNode;
-  bgColor?: FullWidthStripBackgroundColorEnums;
+  bgColor?: FullWidthStripBackgroundColorEnums | string;
 }
 
 export enum FullWidthStripBackgroundColorEnums {
   TRANSPARENT = 'transparent',
-  BLACK = 'black',
-  WHITE = 'white',
-  PRIMARY = 'primary',
-  // Add predefined colors
+  BLACK = '#000',
+  WHITE = '#fff',
+  PRIMARY = '#556cd6',
 }
 
 export function FullWidthStrip({
@@ -21,30 +20,14 @@ export function FullWidthStrip({
 }: FullWidthStripProps) {
   // TODO : Reduce redundancy
 
-  switch (bgColor) {
-    case FullWidthStripBackgroundColorEnums.BLACK:
-      return (
-        <Box className={`w-full bg-black`}>
-          <Strip>{children}</Strip>
-        </Box>
-      );
-    case FullWidthStripBackgroundColorEnums.WHITE:
-      return (
-        <Box className={`w-full bg-white`}>
-          <Strip>{children}</Strip>
-        </Box>
-      );
-    case FullWidthStripBackgroundColorEnums.PRIMARY:
-      return (
-        <Box className={`w-full bg-primary`}>
-          <Strip>{children}</Strip>
-        </Box>
-      );
-    default:
-      return (
-        <Box className={`w-full bg-transparent`}>
-          <Strip>{children}</Strip>
-        </Box>
-      );
-  }
+  return (
+    <Box
+      width="100%"
+      sx={{
+        backgroundColor: bgColor,
+      }}
+    >
+      <Strip>{children}</Strip>
+    </Box>
+  );
 }
