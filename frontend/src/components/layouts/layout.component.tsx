@@ -1,21 +1,42 @@
 import { Footer } from '@components/footers/footer.component';
-import { NavigationBar } from '@components/navigation-bars/navigation-bar.component';
+import {
+  AppBar,
+  navigationBarHeight,
+} from '@components/app-bars/app-bar.component';
 import { Box } from '@mui/material';
 import { ReactNode } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
   showFooter?: boolean;
+  pt?: number;
+  pb?: number;
 }
 
-export function Layout({ children, showFooter = true }: LayoutProps) {
+export function Layout({
+  children,
+  showFooter = true,
+  pt = 0,
+  pb = 0,
+}: LayoutProps) {
   return (
-    <Box className="flex w-full flex-col">
-      <Box className="flex min-h-screen w-full flex-col">
-        <NavigationBar />
-        <Box className="flex w-full flex-col">{children}</Box>
+    <Box id="layout" flex="col" width="100%">
+      <Box id="main" flex="col" minHeight="100vh" width="100%">
+        <AppBar />
+        <Box
+          width="100%"
+          flex="col"
+          sx={{
+            pt: `${navigationBarHeight + pt}px`,
+            pb: `${pb}px`,
+          }}
+        >
+          {children}
+        </Box>
       </Box>
-      {showFooter && <Footer />}
+      <Box display={showFooter ? 'block' : 'hidden'}>
+        <Footer />
+      </Box>
     </Box>
   );
 }

@@ -19,14 +19,35 @@ export function PostCard({ card }: PostCardProps) {
   const description = shortenString(card.description, maxDescriptionLength);
 
   return (
-    <Box className="mr-6 mb-6 h-[150px] w-[300px] rounded bg-white p-4">
-      <Stack spacing={2} className="flex flex-col">
-        <Typography>{title}</Typography>
-        <Typography className="h-[60px] w-full text-sm">
+    <Stack
+      spacing={6}
+      height={200}
+      width={300}
+      borderRadius="10px"
+      p={4}
+      sx={{
+        backgroundColor: 'white',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+      }}
+    >
+      <Stack spacing={3} flex="col">
+        <Typography fontWeight="bold">{title}</Typography>
+        <Typography height={60} width="100%" fontSize={14}>
           {description}
         </Typography>
       </Stack>
-      <Box className="text-sm text-primary hover:underline">더보기</Box>
-    </Box>
+      <Box>
+        <Typography
+          fontSize={14}
+          sx={{
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          }}
+        >
+          더보기
+        </Typography>
+      </Box>
+    </Stack>
   );
 }

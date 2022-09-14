@@ -1,13 +1,15 @@
+import { HeadMeta } from '@components/heads/meta-head.component';
 import { HomeContainer } from '@containers/home';
 import { Box } from '@mui/material';
-import Head from 'next/head';
 
 export default function HomePage() {
   return (
     <Box>
-      <Head>
-        <title>Title</title>
-      </Head>
+      <HeadMeta
+        title="NextJS Boilerplate"
+        description="NextJS Boilerplate"
+        url="http://localhost:3000"
+      />
       <HomeContainer />
     </Box>
   );

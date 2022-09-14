@@ -36,7 +36,7 @@ export function MovieCard(props: MovieCardProps) {
         <Typography gutterBottom variant="h6" component="div">
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" className="h-28">
+        <Typography variant="body2" color="text.secondary" height={112}>
           {overview}
         </Typography>
       </CardContent>
