@@ -13,9 +13,9 @@ export function ResetPasswordContainer() {
   return (
     <Layout>
       <Strip>
-        <Stack spacing={4} className="flex w-full flex-col">
-          <Box className="flex justify-center py-12">
-            <Typography className="text-3xl font-bold">
+        <Stack spacing={4} flex="col" width="100%">
+          <Box display="flex" justifyContent="center" py={12}>
+            <Typography variant="h4" fontWeight="bold">
               비밀번호 재설정
             </Typography>
           </Box>
@@ -35,28 +35,34 @@ export function ResetPasswordContainer() {
                 );
               }
             }}
-            className="flex flex-col space-y-4"
           >
-            <TextField
-              label="이메일"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              required
-            />
+            <Stack spacing={4}>
+              <TextField
+                label="이메일"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                required
+              />
 
-            <Button
-              disabled={!email}
-              fullWidth
-              variant="contained"
-              type="submit"
-            >
-              비밀번호 재설정
-            </Button>
+              <Button
+                disabled={!email}
+                fullWidth
+                variant="contained"
+                type="submit"
+              >
+                비밀번호 재설정
+              </Button>
+            </Stack>
           </form>
-          <Box className="flex w-full justify-end">
+          <Box display="flex" width="100%" justifyContent="end">
             <NextLink href="/sign-in" passHref>
-              <Link className="text-grey text-sm hover:underline">
+              <Link
+                sx={{
+                  color: 'gray',
+                  fontSize: '0.875rem',
+                }}
+              >
                 계정이 있으신가요?
               </Link>
             </NextLink>

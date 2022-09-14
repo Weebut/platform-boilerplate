@@ -7,7 +7,14 @@ interface StripProps {
 
 export function Strip({ children }: StripProps) {
   return (
-    <Container maxWidth="lg" className="w-full px-6 lg:px-0">
+    <Container
+      maxWidth="lg"
+      sx={{
+        width: '100%',
+        px: 5,
+      }}
+      disableGutters
+    >
       {children}
     </Container>
   );
