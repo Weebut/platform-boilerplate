@@ -1,17 +1,28 @@
-import { Box, Link, Stack, Typography } from '@mui/material';
+import { Link, Stack, Typography } from '@mui/material';
 import NextLink from 'next/link';
 
 export function NotFoundContainer() {
   return (
     <Stack
       spacing={8}
-      className="flex h-screen w-screen flex-col items-center justify-center"
+      flex="col"
+      height="100vh"
+      width="100vw"
+      alignItems="center"
+      justifyContent="center"
     >
-      <Typography className="text-6xl font-bold">404</Typography>
-      <Stack spacing={2} className="flex flex-col text-center">
-        <Typography className="text-xl">{`페이지를 찾을 수 없어요 :(`}</Typography>
+      <Typography variant="h1" fontWeight="bold">
+        404
+      </Typography>
+      <Stack spacing={2} flex="col" textAlign="center">
+        <Typography variant="h5">{`페이지를 찾을 수 없어요 :(`}</Typography>
         <NextLink href="/" passHref>
-          <Link className="text-primary text-opacity-90 hover:text-opacity-100 hover:underline">
+          <Link
+            sx={{
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
+            }}
+          >
             홈으로 돌아갑니다
           </Link>
         </NextLink>

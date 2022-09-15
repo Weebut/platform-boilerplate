@@ -1,4 +1,4 @@
-import { fetcher } from '@libs/http/swr-fetcher';
+import { fetcher } from '@libs/swr/swr-fetcher';
 import { KeyedMutator } from 'swr';
 import _useSWRInfinite from 'swr/infinite';
 

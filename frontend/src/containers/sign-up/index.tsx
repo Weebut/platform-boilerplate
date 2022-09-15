@@ -1,8 +1,8 @@
 import { Layout } from '@components/layouts/layout.component';
 import { Strip } from '@components/strips/strip.component';
 import { signUp } from '@libs/utils/auth/sign-up';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -38,58 +38,65 @@ export function SignUpContainer() {
   return (
     <Layout>
       <Strip>
-        <Stack spacing={4} className="flex w-full flex-col">
-          <Box className="flex justify-center py-12">
-            <Typography className="text-3xl font-bold">회원가입</Typography>
+        <Stack spacing={4} flex="col" width="100%">
+          <Box display="flex" justifyContent="center" py={12}>
+            <Typography variant="h4" fontWeight="bold">
+              회원가입
+            </Typography>
           </Box>
           <form
-            className="flex flex-col space-y-4"
             onSubmit={(event) => {
               event.preventDefault();
               handleSignUp();
             }}
           >
-            <TextField
-              label="이메일"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              required
-              disabled={isLoading}
-            />
-            <TextField
-              label="비밀번호"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              required
-              disabled={isLoading}
-            />
-            <TextField
-              label="비밀번호 재입력"
-              value={retyped}
-              onChange={(e) => setRetyped(e.target.value)}
-              type="password"
-              required
-              disabled={isLoading}
-            />
-            <Button
-              disabled={
-                isLoading || !(email && password) || password !== retyped
-              }
-              fullWidth
-              variant="contained"
-              type="submit"
-            >
-              회원가입
-            </Button>
+            <Stack direction="column" spacing={4}>
+              <TextField
+                label="이메일"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                required
+                disabled={isLoading}
+              />
+              <TextField
+                label="비밀번호"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                required
+                disabled={isLoading}
+              />
+              <TextField
+                label="비밀번호 재입력"
+                value={retyped}
+                onChange={(e) => setRetyped(e.target.value)}
+                type="password"
+                required
+                disabled={isLoading}
+              />
+              <Button
+                disabled={
+                  isLoading || !(email && password) || password !== retyped
+                }
+                fullWidth
+                variant="contained"
+                type="submit"
+              >
+                회원가입
+              </Button>
+            </Stack>
           </form>
-          <Box className="flex w-full justify-end">
-            <Link href="/sign-in">
-              <a className="text-grey text-sm hover:underline">
+          <Box display="flex" width="100%" justifyContent="end">
+            <NextLink href="/sign-in" passHref>
+              <Link
+                sx={{
+                  color: 'gray',
+                }}
+              >
                 계정이 있으신가요?
-              </a>
-            </Link>
+              </Link>
+            </NextLink>
           </Box>
         </Stack>
       </Strip>
