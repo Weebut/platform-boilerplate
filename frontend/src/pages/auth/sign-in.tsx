@@ -1,4 +1,4 @@
-import { SignInContainer } from '@containers/sign-in';
+import SignInContainer from '@containers/sign-in';
 import Head from 'next/head';
 
 export default function SignInPage() {

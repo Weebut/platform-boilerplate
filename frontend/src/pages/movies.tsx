@@ -1,4 +1,4 @@
-import { MoviesContainer } from '@containers/movies';
+import MoviesContainer from '@containers/movies';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 

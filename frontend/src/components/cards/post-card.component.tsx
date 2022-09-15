@@ -10,7 +10,7 @@ interface PostCardProps {
   card: Card;
 }
 
-export function PostCard({ card }: PostCardProps) {
+export default function PostCard({ card }: PostCardProps) {
   const maxTitleLength = 20;
   const maxDescriptionLength = 100;
 

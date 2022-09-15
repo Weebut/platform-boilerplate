@@ -1,4 +1,4 @@
-import { SignInContainer } from '@containers/sign-in';
+import SignInContainer from '@containers/sign-in';
 import { ClientSideAuthGuard } from '@libs/guards/client/auth.guard';
 import { withSessionSsr } from '@libs/iron-session/iron-session';
 import { Box } from '@mui/material';

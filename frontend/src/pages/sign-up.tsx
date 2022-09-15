@@ -1,4 +1,4 @@
-import { SignUpContainer } from '@containers/sign-up';
+import SignUpContainer from '@containers/sign-up';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 
