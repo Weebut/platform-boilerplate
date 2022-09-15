@@ -1,10 +1,10 @@
-import { PostCard } from '@components/cards/post-card.component';
-import { Layout } from '@components/layouts/layout.component';
-import { Strip } from '@components/strips/strip.component';
+import PostCard from '@components/cards/post-card.component';
+import Layout from '@components/layouts/layout.component';
+import Strip from '@components/strips/strip.component';
 import { useFirebaseUser } from '@hooks/firebase-user';
 import { Box, Stack, Typography } from '@mui/material';
 
-export function MyPageContainer() {
+export default function MyPageContainer() {
   // Data queried from external service
   const cards = [
     {

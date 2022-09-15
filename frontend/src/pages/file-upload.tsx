@@ -1,4 +1,4 @@
-import { FileUploadContainer } from '@containers/file-upload';
+import FileUploadContainer from '@containers/file-upload';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 

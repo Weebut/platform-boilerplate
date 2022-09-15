@@ -1,4 +1,4 @@
-import { NotFoundContainer } from '@containers/not-found';
+import NotFoundContainer from '@containers/not-found';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 

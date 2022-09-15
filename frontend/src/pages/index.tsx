@@ -1,5 +1,5 @@
-import { HeadMeta } from '@components/heads/meta-head.component';
-import { HomeContainer } from '@containers/home';
+import HeadMeta from '@components/heads/meta-head.component';
+import HomeContainer from '@containers/home';
 import { Box } from '@mui/material';
 
 export default function HomePage() {

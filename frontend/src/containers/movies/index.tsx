@@ -1,12 +1,12 @@
-import { MovieCard } from '@components/cards/movie-card.component';
-import { Layout } from '@components/layouts/layout.component';
-import { Strip } from '@components/strips/strip.component';
+import MovieCard from '@components/cards/movie-card.component';
+import Layout from '@components/layouts/layout.component';
+import Strip from '@components/strips/strip.component';
 import { useIntersectionObserver } from '@hooks/intersection-observer';
 import { useMoviesInfinite } from '@hooks/use-movies-infinte';
 import { Box, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
-export function MoviesContainer() {
+export default function MoviesContainer() {
   const moviesResult = useMoviesInfinite();
 
   const infiniteScrollTarget = 'load-more';

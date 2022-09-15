@@ -1,4 +1,4 @@
-import { MyPageContainer } from '@containers/my-page';
+import MyPageContainer from '@containers/my-page';
 import { ClientSideAuthGuard } from '@libs/guards/client/auth.guard';
 import { authGuard } from '@libs/guards/server/auth.guard';
 import { withSessionSsr } from '@libs/iron-session/iron-session';

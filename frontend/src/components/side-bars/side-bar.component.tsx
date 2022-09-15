@@ -15,7 +15,7 @@ type Tab = {
   name: string;
 };
 
-export function SideBar({ groups }: SideBarProps) {
+export default function SideBar({ groups }: SideBarProps) {
   const [selected, setSelected] = useState<Group>(groups[0]);
 
   return (

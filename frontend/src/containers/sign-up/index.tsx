@@ -1,12 +1,12 @@
-import { Layout } from '@components/layouts/layout.component';
-import { Strip } from '@components/strips/strip.component';
+import Layout from '@components/layouts/layout.component';
+import Strip from '@components/strips/strip.component';
 import { signUp } from '@libs/utils/auth/sign-up';
 import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-export function SignUpContainer() {
+export default function SignUpContainer() {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);

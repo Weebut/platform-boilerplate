@@ -14,7 +14,7 @@ interface MovieCardProps {
   overview: string;
 }
 
-export function MovieCard(props: MovieCardProps) {
+export default function MovieCard(props: MovieCardProps) {
   const maxTitleLength = 20;
   const maxOverviewLength = 100;
 
