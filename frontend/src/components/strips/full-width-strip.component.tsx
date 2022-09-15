@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { ReactNode } from 'react';
-import { Strip } from './strip.component';
+import Strip from './strip.component';
 
 interface FullWidthStripProps {
   children: ReactNode;
@@ -14,7 +14,7 @@ export enum FullWidthStripBackgroundColorEnums {
   PRIMARY = '#556cd6',
 }
 
-export function FullWidthStrip({
+export default function FullWidthStrip({
   children,
   bgColor = FullWidthStripBackgroundColorEnums.TRANSPARENT,
 }: FullWidthStripProps) {

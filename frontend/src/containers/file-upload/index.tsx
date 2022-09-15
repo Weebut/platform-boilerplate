@@ -1,11 +1,11 @@
-import { Layout } from '@components/layouts/layout.component';
-import { Strip } from '@components/strips/strip.component';
+import Layout from '@components/layouts/layout.component';
+import Strip from '@components/strips/strip.component';
 import { useWarnBeforeClosing } from '@hooks/warn-before-closing';
 import { Box, Button, Typography } from '@mui/material';
 import axios from 'axios';
 import { BaseSyntheticEvent } from 'react';
 
-export function FileUploadContainer() {
+export default function FileUploadContainer() {
   useWarnBeforeClosing({ isClosable: false });
 
   return (

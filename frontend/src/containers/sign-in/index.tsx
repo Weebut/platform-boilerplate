@@ -1,5 +1,5 @@
-import { Layout } from '@components/layouts/layout.component';
-import { Strip } from '@components/strips/strip.component';
+import Layout from '@components/layouts/layout.component';
+import Strip from '@components/strips/strip.component';
 import { signIn } from '@libs/utils/auth/sign-in';
 import { signInWithGithub } from '@libs/utils/auth/sign-in-with-github';
 import { signInWithGoogle } from '@libs/utils/auth/sign-in-with-google';
@@ -10,7 +10,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-export function SignInContainer() {
+export default function SignInContainer() {
   const router = useRouter();
   const dispatch = useAppDispatch();
 

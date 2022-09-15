@@ -1,12 +1,12 @@
-import { Layout } from '@components/layouts/layout.component';
-import { Strip } from '@components/strips/strip.component';
+import Layout from '@components/layouts/layout.component';
+import Strip from '@components/strips/strip.component';
 import { sendPasswordResetEmail } from '@libs/utils/auth/send-password-reset-email';
 import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-export function ResetPasswordContainer() {
+export default function ResetPasswordContainer() {
   const router = useRouter();
   const [email, setEmail] = useState<string>('');
 

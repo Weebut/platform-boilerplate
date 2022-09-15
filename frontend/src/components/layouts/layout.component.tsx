@@ -1,6 +1,5 @@
-import { Footer } from '@components/footers/footer.component';
-import {
-  AppBar,
+import Footer from '@components/footers/footer.component';
+import AppBar, {
   navigationBarHeight,
 } from '@components/app-bars/app-bar.component';
 import { Box } from '@mui/material';
@@ -13,7 +12,7 @@ interface LayoutProps {
   pb?: number;
 }
 
-export function Layout({
+export default function Layout({
   children,
   showFooter = true,
   pt = 0,

@@ -1,4 +1,4 @@
-import { ResetPasswordContainer } from '@containers/reset-password';
+import ResetPasswordContainer from '@containers/reset-password';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 

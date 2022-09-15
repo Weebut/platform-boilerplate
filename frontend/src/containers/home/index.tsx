@@ -1,13 +1,12 @@
-import { Layout } from '@components/layouts/layout.component';
-import {
-  FullWidthStrip,
+import Layout from '@components/layouts/layout.component';
+import FullWidthStrip, {
   FullWidthStripBackgroundColorEnums,
 } from '@components/strips/full-width-strip.component';
-import { Strip } from '@components/strips/strip.component';
+import Strip from '@components/strips/strip.component';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 
-export function HomeContainer() {
+export default function HomeContainer() {
   return (
     <Layout>
       <FullWidthStrip bgColor={FullWidthStripBackgroundColorEnums.PRIMARY}>

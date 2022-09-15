@@ -7,7 +7,7 @@ interface HeadMetaProps {
   siteName?: string;
 }
 
-export function HeadMeta({
+export default function HeadMeta({
   title,
   description,
   url,

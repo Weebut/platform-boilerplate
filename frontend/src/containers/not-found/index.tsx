@@ -1,7 +1,7 @@
 import { Link, Stack, Typography } from '@mui/material';
 import NextLink from 'next/link';
 
-export function NotFoundContainer() {
+export default function NotFoundContainer() {
   return (
     <Stack
       spacing={8}

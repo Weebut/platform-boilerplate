@@ -12,7 +12,7 @@ import {
 
 export const navigationBarHeight = 64;
 
-export function AppBar() {
+export default function AppBar() {
   const { user } = useFirebaseUser();
 
   const isLoggedIn = !!user;

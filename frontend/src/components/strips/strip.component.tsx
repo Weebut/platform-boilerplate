@@ -5,7 +5,7 @@ interface StripProps {
   children: ReactNode;
 }
 
-export function Strip({ children }: StripProps) {
+export default function Strip({ children }: StripProps) {
   return (
     <Container
       maxWidth="lg"
