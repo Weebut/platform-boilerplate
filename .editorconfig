@@ -18,7 +18,7 @@ indent_size = 2
 [*.{tsx, jsx}]
 charset = utf-8
 indent_style = space
-indent_size = 4
+indent_size = 2
 
 [*.{conf,config,template}]
 charset = utf-8
