@@ -20,7 +20,7 @@ interface AppPropsExtended extends AppProps {
 export default function App({
   Component,
   emotionCache = clientSideEmotionCache,
-  pageProps: { session, ...pageProps },
+  pageProps,
 }: AppPropsExtended) {
   return (
     <ReduxProvider store={store}>
