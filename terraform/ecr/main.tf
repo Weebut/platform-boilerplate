@@ -29,9 +29,11 @@ locals {
   }
 }
 
-resource "aws_ecr_repository" "server" {
-  name                 = "server"
+resource "aws_ecr_repository" "repos" {
+  for_each = { for repo in var.repos : repo => {repo=repo} }
+  name                 = each.key
   image_tag_mutability = "MUTABLE"
+  force_delete = true
 
   image_scanning_configuration {
     scan_on_push = true
@@ -39,72 +41,3 @@ resource "aws_ecr_repository" "server" {
 
   tags = local.tags
 }
-
-resource "aws_ecr_repository" "server_nginx" {
-  name                 = "server-nginx"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = local.tags
-}
-
-resource "aws_ecr_repository" "client_nginx" {
-  name                 = "client-nginx"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = local.tags
-}
-
-resource "aws_ecr_repository" "client" {
-  name                 = "client"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = local.tags
-}
-
-resource "aws_ecr_repository" "strapi" {
-  name                 = "strapi"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = local.tags
-}
-
-
-resource "aws_ecr_repository" "strapi_admin" {
-  name                 = "strapi-admin"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = local.tags
-}
-
-
-resource "aws_ecr_repository" "strapi_nginx" {
-  name                 = "strapi-nginx"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = local.tags
-}
-

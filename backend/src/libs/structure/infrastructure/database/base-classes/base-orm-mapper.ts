@@ -6,7 +6,7 @@ import { BaseTypeormEntity } from './base-typeorm-entity';
 
 export type OrmEntityProps<BaseOrmEntity> = Omit<
   BaseOrmEntity,
-  'id' | 'createdAt' | 'updatedAt'
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
 >;
 
 export interface EntityProps<Props> {
@@ -37,6 +37,9 @@ export abstract class BaseOrmMapper<
       props,
       createdAt: new DateVO(ormEntityBase.createdAt),
       updatedAt: new DateVO(ormEntityBase.updatedAt),
+      ...(undefined !== ormEntityBase.deletedAt && {
+        deletedAt: new DateVO(ormEntityBase.deletedAt),
+      }),
     });
   }
 
@@ -48,6 +51,9 @@ export abstract class BaseOrmMapper<
       id: entity.id.value,
       createdAt: entity.createdAt.value,
       updatedAt: entity.updatedAt.value,
+      ...(undefined !== entity.deletedAt && {
+        deletedAt: entity.deletedAt.value,
+      }),
     });
   }
 }

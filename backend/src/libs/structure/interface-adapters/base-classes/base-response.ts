@@ -6,8 +6,12 @@ export class BaseResponse extends IdResponse {
     super(entity.id.value);
     this.createdAt = entity.createdAt.value.toISOString();
     this.updatedAt = entity.updatedAt.value.toISOString();
+    this.deletedAt = entity.deletedAt
+      ? entity.deletedAt.value.toISOString()
+      : undefined;
   }
 
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly deletedAt?: string;
 }

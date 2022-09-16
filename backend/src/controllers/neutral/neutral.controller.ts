@@ -5,7 +5,9 @@ import {
   HealthCheck,
   HealthCheckResult,
 } from '@nestjs/terminus';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Neutral')
 @Controller({ version: VERSION_NEUTRAL })
 export class NeutralController {
   constructor(

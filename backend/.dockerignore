@@ -1,3 +1,5 @@
 .eslint*
 .nvm*
 .git/
+setup
+.env*

@@ -1,36 +1,18 @@
+import { UserOrmEntity } from '@components/users/database/orm-entities/user.orm-entity';
 import { CreateUser } from '@interface-adapters/interfaces/users/create-user.interface';
-import { Transform } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { PickType } from '@nestjs/swagger';
 
-export class CreateUserRequest implements CreateUser {
-  @IsEmail()
-  @MaxLength(320)
-  email: string;
-
-  @Transform(({ value }) => value.trim())
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(32)
-  @MinLength(1)
-  familyName: string;
-
-  @Transform(({ value }) => value.trim())
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(32)
-  @MinLength(1)
-  givenName: string;
-
-  @Transform(({ value }) => value.trim())
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(32)
-  @MinLength(2)
-  nickname: string;
+export class CreateUserRequest
+  extends PickType(UserOrmEntity, [
+    'email',
+    'nickname',
+    'familyName',
+    'givenName',
+  ])
+  implements CreateUser
+{
+  get fullName() {
+    // sample dto getter
+    return `${this.familyName} ${this.givenName}`;
+  }
 }

@@ -25,7 +25,7 @@ export class UserOrmMapper extends BaseOrmMapper<User, UserOrmEntity> {
       portfolios:
         props.portfolios?.map((portfolio) => {
           const id = portfolio.id.value;
-          const { createdAt, updatedAt, link, ...portfolioProps } =
+          const { createdAt, updatedAt, deletedAt, link, ...portfolioProps } =
             portfolio.getCopy();
           return new PortfolioOrmEntity({
             ...portfolioProps,
@@ -34,6 +34,7 @@ export class UserOrmMapper extends BaseOrmMapper<User, UserOrmEntity> {
             user: null,
             createdAt: createdAt.value,
             updatedAt: updatedAt.value,
+            deletedAt: deletedAt.value,
           });
         }) ?? [],
     };

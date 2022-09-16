@@ -6,8 +6,10 @@ import { EnvironmentConfigService } from '../environment/environment.service';
 
 const getBullModuleOptions = (config: EnvironmentConfigService) => {
   return {
-    host: config.getRedisHost(),
-    port: config.getRedisPort(),
+    redis: {
+      host: config.redisHost,
+      port: config.redisPort,
+    },
   } as Bull.QueueOptions;
 };
 
