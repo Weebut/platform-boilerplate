@@ -12,6 +12,7 @@ export interface BaseEntityProps {
   id: ID;
   createdAt: DateVO;
   updatedAt: DateVO;
+  deletedAt?: DateVO;
 }
 
 export interface CreateEntityProps<T> {
@@ -19,6 +20,7 @@ export interface CreateEntityProps<T> {
   props: T;
   createdAt?: DateVO;
   updatedAt?: DateVO;
+  deletedAt?: DateVO;
 }
 
 export abstract class BaseEntity<EntityProps> {
@@ -27,6 +29,7 @@ export abstract class BaseEntity<EntityProps> {
     props,
     createdAt,
     updatedAt,
+    deletedAt,
   }: CreateEntityProps<EntityProps>) {
     this.validateProps(props);
 
@@ -36,14 +39,17 @@ export abstract class BaseEntity<EntityProps> {
     this.props = props;
     this._createdAt = createdAt || now;
     this._updatedAt = updatedAt || now;
+    this._deletedAt = deletedAt;
 
     this.validate();
   }
 
   protected abstract _id: ID; // Implement freely
   protected readonly props: EntityProps;
+
   private readonly _createdAt: DateVO;
   private _updatedAt: DateVO;
+  private readonly _deletedAt?: DateVO;
 
   get id() {
     return this._id;
@@ -59,6 +65,10 @@ export abstract class BaseEntity<EntityProps> {
 
   get updatedAt() {
     return this._updatedAt;
+  }
+
+  get deletedAt() {
+    return this._deletedAt;
   }
 
   static isEntity(entity: unknown): entity is BaseEntity<unknown> {
@@ -86,6 +96,7 @@ export abstract class BaseEntity<EntityProps> {
       id: this._id,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
+      ...(this._deletedAt && { deletedAt: this._deletedAt }),
       ...this.props,
     };
     return Object.freeze(propsCopy);
@@ -98,6 +109,7 @@ export abstract class BaseEntity<EntityProps> {
       id: this._id,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
+      ...(this._deletedAt && { deletedAt: this._deletedAt }),
       ...plainProps,
     };
 

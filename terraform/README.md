@@ -29,9 +29,9 @@ Author: Jaemin Kim
 /path/to/nestjs-boilerplate/terraform/lightsail % terraform init
 /path/to/nestjs-boilerplate/terraform/lightsail % terraform workspace new dev
 /path/to/nestjs-boilerplate/terraform/lightsail % terraform workspace select dev
-/path/to/nestjs-boilerplate/terraform/lightsail % terraform apply -var-file="../vars/dev.tfvars" -target="awslightsail_certificate.cert"
-/path/to/nestjs-boilerplate/terraform/lightsail % terraform apply -var-file="../vars/dev.tfvars"
+/path/to/nestjs-boilerplate/terraform/lightsail % AWS_PROFILE=init-infra terraform apply -var-file="../vars/dev.tfvars" -target="awslightsail_certificate.cert"
+/path/to/nestjs-boilerplate/terraform/lightsail % AWS_PROFILE=init-infra terraform apply -var-file="../vars/dev.tfvars"
 
 ```
 
-각 terraform module 별 배포 순서는 ecr -> lightsail (여러번 해야함, certificate 설정을 기다리지 않음) -> (직접 lightsail 콘솔에서 이미지 설정, DB에 strapi database 설정) -> lightsail/deploy 이다
+각 terraform module 별 배포 순서는 ecr -> lightsail (외부 API를 사용해 리소스를 만드는 것이므로 여러번 시도해야함, certificate 설정을 기다리지 않음) -> (직접 lightsail 콘솔에서 이미지 설정, DB에 strapi database 설정) -> lightsail/deploy 이다

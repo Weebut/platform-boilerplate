@@ -5,7 +5,7 @@ import { UserAlreadyExistsError } from '@components/users/errors/create-user.err
 import { FindOneUserQuery } from '@components/users/queries/find-one-user/find-one-user.query';
 import { FindUsersQuery } from '@components/users/queries/find-users/find-users.query';
 import { CreateUserRequest } from '@controllers/v1/users/dtos/request/commands/create-user.request.dto';
-import { v1 } from '@infrastructure/configs/versions/v1';
+import { v1 } from '@libs/const/versions.const';
 import { ConflictException } from '@libs/exceptions';
 import { ID } from '@libs/structure/domain/value-objects/id.value-object';
 import { IdResponse } from '@libs/structure/interface-adapters/dtos/id-response.dto';
@@ -14,18 +14,21 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
   Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { usersRouteRoot } from './constants/route';
 import { FindUsersRequest } from './dtos/request/queries/find-users.request.dto';
 import { UserResponse } from './dtos/response/user.response.dto';
 
+@ApiTags('Users')
 @Controller({ version: v1, path: usersRouteRoot })
 export class UsersController {
   constructor(
@@ -35,8 +38,10 @@ export class UsersController {
 
   @Post()
   @Public()
-  async create(@Body() body: CreateUserRequest): Promise<IdResponse> {
-    const command = new CreateUserCommand(body);
+  @ApiResponse({ status: HttpStatus.CREATED, type: IdResponse })
+  async create(@Body() dto: CreateUserRequest): Promise<IdResponse> {
+    const command = new CreateUserCommand(dto);
+    console.log(`name: ${dto.fullName}`);
     try {
       const result: ID = await this.commandBus.execute(command);
 
@@ -51,7 +56,7 @@ export class UsersController {
 
   @Get()
   @Auth('read:users')
-  async findUsers(@Query() queries: FindUsersRequest) {
+  async findUsers(@Query() queries: FindUsersRequest): Promise<UserResponse[]> {
     const query = new FindUsersQuery(queries);
     const result = await this.queryBus.execute(query);
 
@@ -60,7 +65,10 @@ export class UsersController {
 
   @Get(':userId')
   @Auth('read:users')
-  async findUser(@Param('userId', ParseUUIDPipe) userId: string) {
+  @ApiResponse({ status: HttpStatus.OK, type: UserResponse })
+  async findUser(
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<UserResponse> {
     const query = new FindOneUserQuery({ userId });
     const result = await this.queryBus.execute(query);
 
@@ -69,6 +77,7 @@ export class UsersController {
 
   @Delete(':userId')
   @Auth('delete:users')
+  @ApiResponse({ status: HttpStatus.NO_CONTENT })
   async delete(@Param('userId', ParseUUIDPipe) userId: string) {
     const command = new DeleteUserCommand({ userId });
     await this.commandBus.execute(command);

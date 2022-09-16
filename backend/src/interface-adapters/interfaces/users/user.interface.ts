@@ -1,5 +1,4 @@
 export interface User {
-  email: string;
   name: {
     familyName: string;
     givenName: string;
@@ -10,5 +9,9 @@ export interface User {
     link: string;
     createdAt: string;
     updatedAt: string;
+    deletedAt?: string;
   }[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }

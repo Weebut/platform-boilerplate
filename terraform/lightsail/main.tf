@@ -52,6 +52,7 @@ resource "awslightsail_container_service" "services" {
 }
 
 resource "awslightsail_certificate" "cert" {
+  provider = awslightsail.global
   for_each = { for service in var.container_services : service.name => service }
   name        = each.value.certificate_name
   domain_name = each.value.domain_name
@@ -84,6 +85,7 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "awslightsail_container_public_domain_names" "domains" {
+  provider = awslightsail.global
   for_each = { for service in var.container_services : service.name => service }
   container_service_name = "${local.name}-${each.key}"
   public_domain_names {
@@ -94,7 +96,8 @@ resource "awslightsail_container_public_domain_names" "domains" {
   }
   depends_on = [
     aws_route53_record.cert_validation,
-    awslightsail_container_service.services,
+    awslightsail_certificate.cert,
+    awslightsail_container_service.services
   ]
 }
 
@@ -106,6 +109,6 @@ resource "aws_lightsail_database" "db" {
   master_username      = var.database_config.username
   blueprint_id         = "${var.database_config.type}_${join("_",split(".",var.database_config.version))}"
   bundle_id            = var.database_config.bundle_id
-
+  skip_final_snapshot  = true
   tags = local.tags
 }
