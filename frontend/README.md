@@ -4,6 +4,7 @@
 
 - .env.development (for local testing)
 - .env (for production testing)
+- firebase emulator (should be installed and configured with .firebaserc)
 
 ## Quick Start
 

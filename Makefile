@@ -4,7 +4,7 @@ build-front-dev: ## Build the development docker image.
 
 .PHONY: start-front-dev
 start-front-dev: ## Start the development docker container.
-	cd frontend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development up -d
+	cd frontend && docker compose -f docker-compose.dev.yaml --env-file ./.env.development up -d && firebase emulators:start
 
 .PHONY: stop-front-dev
 stop-front-dev: ## Stop the development docker container.

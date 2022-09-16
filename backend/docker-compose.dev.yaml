@@ -19,12 +19,11 @@ services:
     restart: always
     volumes:
       - mysqldata:/var/lib/mysql
+      - ./setup/db/create_strapi.sql:/docker-entrypoint-initdb.d/1.sql
     command:
       - --default-authentication-plugin=mysql_native_password
-      # - --user=root --password=${MYSQL_ROOT_PASSWORD}
-      # - <<< "create database strapi; grant all privileges on strapi.* to ${CMS_USER}@'%' identified by ${CMS_PASSWORD};"
     env_file:
-      - .env.development
+      - ./.env.development
     ports:
       - 3306:3306
     networks:
@@ -57,9 +56,13 @@ services:
         - NODE_VERSION=${NODE_VERSION:-16.14.2}
     restart: always
     env_file:
-      - .env.development
+      - ./.env.development
+    environment:
+      - CMS_USER=strapi_admin
+      - CMS_PASSWORD=strapi_admin
+      - CMS_NAME=strapi
     depends_on:
       - db
       - redis
     volumes:
-      - .:/app
+      - ./src:/app/src
