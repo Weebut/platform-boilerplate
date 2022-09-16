@@ -39,8 +39,9 @@ export class UsersController {
   @Post()
   @Public()
   @ApiResponse({ status: HttpStatus.CREATED, type: IdResponse })
-  async create(@Body() body: CreateUserRequest): Promise<IdResponse> {
-    const command = new CreateUserCommand(body);
+  async create(@Body() dto: CreateUserRequest): Promise<IdResponse> {
+    const command = new CreateUserCommand(dto);
+    console.log(`name: ${dto.fullName}`);
     try {
       const result: ID = await this.commandBus.execute(command);
 

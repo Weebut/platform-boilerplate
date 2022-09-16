@@ -9,4 +9,10 @@ export class CreateUserRequest
     'familyName',
     'givenName',
   ])
-  implements CreateUser {}
+  implements CreateUser
+{
+  get fullName() {
+    // sample dto getter
+    return `${this.familyName} ${this.givenName}`;
+  }
+}
