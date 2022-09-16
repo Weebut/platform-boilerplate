@@ -1,6 +1,6 @@
 import { BaseEntityProps } from '@libs/structure/domain/base-classes/base-entity';
 import { ID } from '@libs/structure/domain/value-objects/id.value-object';
-import { DeepPartial } from '@libs/types/deep-partial.type';
+import { DeepPartial } from '@libs/types/common.type';
 
 export type QueryParams<EntityProps> = DeepPartial<
   BaseEntityProps & EntityProps

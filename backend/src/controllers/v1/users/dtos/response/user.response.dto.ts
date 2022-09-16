@@ -1,6 +1,7 @@
 import { User as UserEntity } from '@components/users/domain/entities/user.entity';
 import { User } from '@interface-adapters/interfaces/users/user.interface';
 import { BaseResponse } from '@libs/structure/interface-adapters/base-classes/base-response';
+import { ApiProperty } from '@nestjs/swagger';
 import { PortfolioResponse } from './portfolio.response.dto';
 
 export class UserResponse extends BaseResponse implements User {
@@ -19,11 +20,22 @@ export class UserResponse extends BaseResponse implements User {
       [];
   }
 
+  @ApiProperty()
   readonly email: string;
+
+  @ApiProperty()
   readonly name: {
     familyName: string;
     givenName: string;
     nickName: string;
   };
+  @ApiProperty()
   readonly portfolios: PortfolioResponse[];
+
+  @ApiProperty()
+  readonly createdAt: string;
+  @ApiProperty()
+  readonly updatedAt: string;
+  @ApiProperty()
+  readonly deletedAt?: string;
 }

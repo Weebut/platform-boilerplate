@@ -10,5 +10,9 @@ export interface User {
     link: string;
     createdAt: string;
     updatedAt: string;
+    deletedAt?: string;
   }[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }

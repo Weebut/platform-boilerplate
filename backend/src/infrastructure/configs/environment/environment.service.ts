@@ -5,59 +5,59 @@ import { ConfigService } from '@nestjs/config';
 export class EnvironmentConfigService {
   constructor(private configService: ConfigService) {}
 
-  getDatabaseHost(): string {
+  get dbHost(): string {
     return this.configService.get<string>('DATABASE_HOST');
   }
 
-  getDatabasePort(): number {
+  get dbPort(): number {
     return this.configService.get<number>('DATABASE_PORT');
   }
 
-  getDatabaseUser(): string {
+  get dbUser(): string {
     return this.configService.get<string>('MYSQL_USER');
   }
 
-  getDatabasePassword(): string {
+  get dbPassword(): string {
     return this.configService.get<string>('MYSQL_ROOT_PASSWORD');
   }
 
-  getDatabaseName(): string {
+  get dbName(): string {
     return this.configService.get<string>('MYSQL_DATABASE');
   }
 
-  getDatabaseSync(): boolean {
+  get dbSync(): boolean {
     return this.configService.get<boolean>('DATABASE_SYNC');
   }
 
-  getCMSHost(): string {
+  get cmsHost(): string {
     return this.configService.get<string>('CMS_HOST');
   }
 
-  getCMSPort(): number {
+  get cmsPort(): number {
     return this.configService.get<number>('CMS_PORT');
   }
 
-  getCMSUser(): string {
+  get cmsUser(): string {
     return this.configService.get<string>('CMS_USER');
   }
 
-  getCMSPassword(): string {
+  get cmsPassword(): string {
     return this.configService.get<string>('MYSQL_ROOT_PASSWORD');
   }
 
-  getCMSName(): string {
+  get cmsName(): string {
     return this.configService.get<string>('CMS_NAME');
   }
 
-  getCMSSync(): boolean {
+  get cmsSync(): boolean {
     return this.configService.get<boolean>('CMS_SYNC');
   }
 
-  getRedisHost(): string {
+  get redisHost(): string {
     return this.configService.get<string>('REDIS_HOST');
   }
 
-  getRedisPort(): number {
+  get redisPort(): number {
     return Number(this.configService.get<number>('REDIS_PORT'));
   }
 }
