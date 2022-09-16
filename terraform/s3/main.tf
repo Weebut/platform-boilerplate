@@ -31,7 +31,7 @@ locals {
 
 resource "aws_s3_bucket" "b" {
   bucket = "${var.environment}-init-strapi-bucket"
-
+  force_destroy = true
   tags = local.tags
 }
 
@@ -42,7 +42,7 @@ resource "aws_s3_bucket_acl" "b" {
 
 resource "aws_s3_bucket" "c" {
   bucket = "${var.environment}-init-strapi-upload-bucket"
-
+  force_destroy = true
   tags = local.tags
 }
 
